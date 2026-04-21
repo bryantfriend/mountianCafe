@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - Mountain Cafe</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <svg viewBox="0 0 100 50" style="width:50px; margin-bottom:8px;">
+                    <path d="M20,40 L50,10 L80,40 Z" fill="none" stroke="#ffffff" stroke-width="3"/>
+                    <path d="M40,40 L60,20 L80,40 Z" fill="none" stroke="#ffffff" stroke-width="3"/>
+                </svg>
+                <div style="font-size: 0.9rem;">Mountain Cafe</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active">Orders</a>
+                <a href="#" class="nav-link">Menu</a>
+                <a href="#" class="nav-link">Analytics</a>
+                <a href="#" class="nav-link">Settings</a>
+            </nav>
+            
+            <a href="#" class="nav-link logout">Logout</a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Orders</h1>
+            </header>
+
+            <div class="tabs">
+                <button class="tab active" onclick="setTab('new')" id="tab-new">New (0)</button>
+                <button class="tab" onclick="setTab('preparing')" id="tab-preparing">Preparing (0)</button>
+                <button class="tab" onclick="setTab('ready')" id="tab-ready">Ready (0)</button>
+                <button class="tab" onclick="setTab('completed')" id="tab-completed">Completed</button>
+            </div>
+
+            <div class="content-body">
+                <h2 id="section-title" style="margin-bottom: 1.5rem; font-size:1.1rem; font-weight:700;">New Orders</h2>
+                
+                <div id="orders-container" class="orders-list">
+                    <!-- Orders rendered here -->
+                </div>
+                
+                <div id="empty-state" class="empty-state hidden">
+                    <p>No orders in this section.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

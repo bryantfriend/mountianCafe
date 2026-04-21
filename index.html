@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mountain Cafe - Order</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. LANGUAGE SCREEN -->
+    <section id="screen-language" class="screen active padded">
+        <div class="logo-container">
+            <!-- Mountain Logo -->
+            <svg viewBox="0 0 100 50">
+                <path d="M20,40 L50,10 L80,40 Z" fill="none" stroke="#1f2937" stroke-width="3"/>
+                <path d="M40,40 L60,20 L80,40 Z" fill="none" stroke="#1f2937" stroke-width="3"/>
+            </svg>
+            <h2>Mountain Cafe</h2>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1>Welcome!</h1>
+            <p class="subtitle">Please choose<br>your language</p>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <button class="btn btn-primary" onclick="selectLanguage('en')">
+                🇬🇧 English
+            </button>
+            <button class="btn btn-outline" onclick="selectLanguage('ru')">
+                🇷🇺 Русский
+            </button>
+        </div>
+        
+        <div class="powered-by">
+            Powered by <span>Kyrgyz Organics</span>
+        </div>
+    </section>
+
+    <!-- 2. MENU SCREEN -->
+    <section id="screen-menu" class="screen">
+        <div class="top-header">
+            <button class="icon-btn">☰</button>
+            <div class="center-brand">Mountain Cafe</div>
+            <button class="icon-btn cart-icon-wrapper" onclick="showScreen('screen-cart'); renderCart()">
+                🛒
+                <div class="cart-badge hidden-badge" id="top-cart-badge">0</div>
+            </button>
+        </div>
+
+        <div class="padded">
+            <h1 id="menu-title">Our Menu</h1>
+            
+            <div class="category-tabs" id="category-list"></div>
+
+            <div class="menu-list" id="menu-items"></div>
+        </div>
+    </section>
+
+    <!-- 3. CART SCREEN -->
+    <section id="screen-cart" class="screen">
+        <div class="top-header">
+            <button class="icon-btn" onclick="showScreen('screen-menu')">←</button>
+            <div class="center-brand" id="cart-title">My Order</div>
+            <button class="icon-btn" onclick="clearCart()">🗑️</button>
+        </div>
+
+        <div class="padded" style="display:flex; flex-direction:column; flex:1;">
+            <div id="cart-list"></div>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span id="label-total">Total</span>
+                    <span><span id="cart-total">0</span> som</span>
+                </div>
+                <div>
+                   <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom: 0.5rem;">Your order will be sent to our staff</p>
+                   <button class="btn btn-primary" id="btn-place-order" onclick="placeOrder()">
+                      <span style="margin-right: 8px;">🚀</span> Place Order
+                   </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. CONFIRMATION SCREEN -->
+    <section id="screen-confirm" class="screen padded">
+        <div class="confirm-icon">✓</div>
+        <div class="confirm-text">
+            <h1 id="confirm-msg">Thank you!</h1>
+            <p class="subtitle" id="confirm-submsg" style="margin-bottom: 2rem;">Your order has been received.</p>
+            <div style="background:#f3f4f6; padding: 1rem; border-radius:12px; margin-bottom: 2rem;">
+                We will notify you<br>when it's ready.
+            </div>
+        </div>
+
+        <div class="action-group">
+            <button class="btn btn-pale" onclick="notifyStaff('Waiter')">
+                🔔 Call Waiter
+            </button>
+            <button class="btn btn-pale" onclick="notifyStaff('Bill')">
+                🧾 Request Bill
+            </button>
+        </div>
+    </section>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav hidden" id="main-bottom-nav">
+        <button class="nav-item" onclick="showScreen('screen-menu')">
+            <div style="font-size:1.5rem; line-height:1;">⊞</div>
+            <span id="nav-menu-lbl">Menu</span>
+        </button>
+        <button class="nav-item cart-icon-wrapper" onclick="showScreen('screen-cart'); renderCart()">
+            <div style="font-size:1.5rem; line-height:1;">🧺</div>
+            <div class="cart-badge hidden-badge" id="bottom-cart-badge">0</div>
+            <span id="nav-cart-lbl">My Order</span>
+        </button>
+        <button class="nav-item" onclick="notifyStaff('Waiter')">
+            <div style="font-size:1.5rem; line-height:1;">📞</div>
+            <span id="nav-call-lbl">Call Waiter</span>
+        </button>
+    </nav>
+
+    <script src="main.js"></script>
+</body>
+</html>
