@@ -1,13 +1,67 @@
 // Meyman Shared State and Architecture (ICF Compliant)
 
-var STORAGE_KEY = "meyman_data_v1";
+var STORAGE_KEY = "meyman_data_v2";
 
 function getInitialState() {
+    var now = new Date().toISOString();
     return {
-        offers: [],
-        bookings: [],
+        offers: [
+            {
+                id: "offer_demo_1",
+                title: "Traditional Plov Masterclass",
+                price: 1500,
+                spots: 5,
+                category: "Food",
+                hostName: "Aigul",
+                location: { x: 30, y: 40 },
+                createdAt: now,
+                urgency: "Cooking now"
+            },
+            {
+                id: "offer_demo_2",
+                title: "Ala Archa National Park Hike",
+                price: 2500,
+                spots: 8,
+                category: "Events",
+                hostName: "Beksultan",
+                location: { x: 70, y: 80 },
+                createdAt: now,
+                urgency: "Leaving in 30 min"
+            },
+            {
+                id: "offer_demo_3",
+                title: "Felt Making Cultural Workshop",
+                price: 1200,
+                spots: 4,
+                category: "Events",
+                hostName: "Nazira",
+                location: { x: 50, y: 50 },
+                createdAt: now,
+                urgency: "Starting in 10 min"
+            },
+            {
+                id: "offer_demo_4",
+                title: "Bishkek City Walk",
+                price: 800,
+                spots: 10,
+                category: "Events",
+                hostName: "Timur",
+                location: { x: 20, y: 30 },
+                createdAt: now,
+                urgency: "Gathering soon"
+            }
+        ],
+        bookings: [
+            { bookingId: "booking_demo_1", offerId: "offer_demo_1", timestamp: new Date(Date.now() - 86400000).toISOString() },
+            { bookingId: "booking_demo_2", offerId: "offer_demo_1", timestamp: new Date(Date.now() - 40000000).toISOString() },
+            { bookingId: "booking_demo_3", offerId: "offer_demo_2", timestamp: new Date(Date.now() - 20000000).toISOString() }
+        ],
         requests: [],
-        reviews: []
+        reviews: [
+            { id: "rev_demo_1", offerId: "offer_demo_1", rating: 5, comment: "Amazing plov! Aigul is a wonderful host.", customerName: "Guest_2041", timestamp: new Date(Date.now() - 86400000).toISOString() },
+            { id: "rev_demo_2", offerId: "offer_demo_1", rating: 5, comment: "Loved learning the history while cooking.", customerName: "Guest_5512", timestamp: new Date(Date.now() - 40000000).toISOString() },
+            { id: "rev_demo_3", offerId: "offer_demo_2", rating: 4, comment: "Beautiful mountains, but bring warm clothes!", customerName: "Guest_9912", timestamp: new Date(Date.now() - 20000000).toISOString() }
+        ]
     };
 }
 

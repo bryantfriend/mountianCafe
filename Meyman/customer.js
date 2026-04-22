@@ -139,10 +139,11 @@ function renderMapAndFeed() {
 
         var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
         var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
+        var urgencyTag = offer.urgency || "LIVE";
 
         card.innerHTML = 
             '<div class="offer-card-img" style="background-image: url(\'' + imgUrl + '\');">' +
-                '<div class="live-badge">LIVE</div>' +
+                '<div class="live-badge">' + urgencyTag + '</div>' +
             '</div>' +
             '<div class="offer-card-body">' +
                 '<div class="offer-meta">📍 200m away • ⭐ 4.9 (32)</div>' +
@@ -257,9 +258,30 @@ function bookOffer(offerId) {
     var result = executeAction("BOOK_OFFER", payload);
 
     if (result.success) {
-        alert("Booking successful! Your host is notified.");
         closeOfferModal();
-        renderMapAndFeed(); // Re-render to update spotted values
+        
+        // Show success animation overlay
+        var overlay = document.getElementById("success-overlay");
+        var content = document.getElementById("success-content");
+        overlay.classList.remove("hidden");
+        
+        setTimeout(function() {
+            content.style.opacity = "1";
+            content.style.transform = "scale(1)";
+        }, 10);
+        
+        setTimeout(function() {
+            content.style.opacity = "0";
+            content.style.transform = "scale(0.8)";
+            setTimeout(function() {
+                overlay.classList.add("hidden");
+                renderMapAndFeed(); 
+                if(!document.getElementById("view-explore").classList.contains("hidden")) {
+                    renderExploreFeed();
+                }
+            }, 400);
+        }, 2000);
+        
     } else {
         alert("Booking failed: " + result.error);
     }
