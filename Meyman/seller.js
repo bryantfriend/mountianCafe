@@ -159,5 +159,83 @@ function fulfillRequest(requestId) {
     }
 }
 
+}
+
+// Dummy Feature Handlers for Host App Hackathon MVP
+function openDummyFeature(featureName) {
+    var modal = document.getElementById("dummy-feature-modal");
+    var sheet = document.getElementById("dummy-feature-sheet");
+    
+    // Update active state in bottom nav if applicable
+    var navItems = document.querySelectorAll(".nav-item");
+    for(var i=0; i<navItems.length; i++) {
+        navItems[i].classList.remove("active");
+        var icon = navItems[i].querySelector(".nav-icon");
+        var text = navItems[i].querySelector("span:not(.nav-icon)");
+        if(icon) icon.style.color = "var(--text-tertiary)";
+        if(text) text.style.color = "var(--text-tertiary)";
+        
+        if (featureName !== 'Menu' && featureName !== 'Notifications' && featureName !== 'Calendar' && featureName !== 'Earnings') {
+            if (navItems[i].innerText.indexOf(featureName === 'Messages' ? 'Inbox' : featureName) !== -1) {
+                navItems[i].classList.add("active");
+                if(icon) icon.style.color = "var(--primary)";
+                if(text) text.style.color = "var(--primary)";
+            }
+        }
+    }
+
+    var htmlContent = '<div class="sheet-handle"></div>';
+    htmlContent += '<div style="display:flex; justify-content:space-between; align-items:center;">';
+    htmlContent += '<h2 style="font-size:1.5rem; color:var(--text-primary);">' + featureName + '</h2>';
+    htmlContent += '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeDummyFeature()">✕</button>';
+    htmlContent += '</div>';
+    
+    if (featureName === 'Menu') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Host Settings</button>';
+        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Manage Payments</button>';
+        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Help & Support</button>';
+        htmlContent += '<a href="index.html" class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem; color:var(--primary); text-decoration:none;">Switch to Tourist Mode</a>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Notifications') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary);">New Request Received</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Guest_5412 is looking for a food experience.</div><div style="font-size:0.75rem; color:var(--primary); margin-top:8px;">2 mins ago</div></div>';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary);">Earnings Transferred</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">4,500 KGS has been sent to your linked card.</div><div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:8px;">Yesterday</div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Calendar' || featureName === 'Bookings') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Home Cooked Dinner</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Tomorrow, 19:00 • 2 guests</div><div style="margin-top:8px;"><span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Confirmed</span></div></div>';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Bishkek City Walk</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Saturday, 10:00 • 4 guests</div><div style="margin-top:8px;"><span style="background:#fff3e0; color:#ef6c00; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Awaiting Payment</span></div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Earnings') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="text-align:center; margin-bottom:1rem;"><div style="font-size:2.5rem; font-weight:800; color:var(--text-primary);">18,450 <span style="font-size:1.2rem; color:var(--text-secondary);">KGS</span></div><div style="font-size:0.9rem; color:#4caf50; font-weight:600;">↑ 2,300 this week</div></div>';
+        htmlContent += '<button class="btn btn-primary">Withdraw Funds</button>';
+        htmlContent += '<h3 style="font-size:1.1rem; margin-top:1rem;">Recent Transactions</h3>';
+        htmlContent += '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;"><div><div style="font-weight:600;">Payout to Card</div><div style="font-size:0.8rem; color:var(--text-secondary);">Aug 14</div></div><div style="font-weight:700; color:var(--text-primary);">-4,500 KGS</div></div>';
+        htmlContent += '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;"><div><div style="font-weight:600;">Booking (Dinner)</div><div style="font-size:0.8rem; color:var(--text-secondary);">Aug 12</div></div><div style="font-weight:700; color:#4caf50;">+2,400 KGS</div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Messages') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="display:flex; align-items:center; gap:12px; padding-bottom:1rem; border-bottom:1px solid var(--border-color);"><div style="width:48px; height:48px; border-radius:50%; background:#e0f7fa; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">👨</div><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:700;">John D.</span><span style="font-size:0.75rem; color:var(--text-secondary);">10:42 AM</span></div><div style="font-size:0.9rem; color:var(--text-secondary); margin-top:2px;">Looking forward to the dinner!</div></div></div>';
+        htmlContent += '<div style="display:flex; align-items:center; gap:12px; padding-bottom:1rem; border-bottom:1px solid var(--border-color);"><div style="width:48px; height:48px; border-radius:50%; background:#fce4ec; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">👩</div><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:700;">Sarah M.</span><span style="font-size:0.75rem; color:var(--text-secondary);">Yesterday</span></div><div style="font-size:0.9rem; color:var(--text-primary); font-weight:600; margin-top:2px;">Is the meeting point still at...</div></div><div style="width:10px; height:10px; border-radius:50%; background:var(--primary);"></div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Profile') {
+        htmlContent += '<div style="margin-top:1.5rem; text-align:center; display:flex; flex-direction:column; align-items:center;">';
+        htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:url(\'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200\') center/cover; margin-bottom:1rem;"></div>';
+        htmlContent += '<h3 style="font-size:1.3rem;">Aigul</h3>';
+        htmlContent += '<p style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">Superhost in Bishkek</p>';
+        htmlContent += '<button class="btn btn-outline" style="margin-top:1.5rem;">Edit Profile</button>';
+        htmlContent += '</div>';
+    }
+
+    sheet.innerHTML = htmlContent;
+    modal.classList.remove("hidden");
+}
+
+function closeDummyFeature() {
+    document.getElementById("dummy-feature-modal").classList.add("hidden");
+}
+
 // Boot application
 window.onload = initSellerApp;

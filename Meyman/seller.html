@@ -11,9 +11,9 @@
     <div class="container">
         <!-- Top Header -->
         <header class="seller-header">
-            <div style="font-size:1.5rem; color:var(--text-primary); font-weight:bold;">☰</div>
+            <div style="font-size:1.5rem; color:var(--text-primary); font-weight:bold; cursor:pointer;" onclick="openDummyFeature('Menu')">☰</div>
             <img src="logo.png" alt="Meyman Logo" style="height:40px; object-fit:contain;">
-            <div class="bell-icon">
+            <div class="bell-icon" style="cursor:pointer;" onclick="openDummyFeature('Notifications')">
                 🔔
                 <div class="badge-red">2</div>
             </div>
@@ -85,15 +85,15 @@
                     <div class="qa-icon red">＋</div>
                     <span>Create New<br>Offer</span>
                 </button>
-                <button class="qa-btn">
+                <button class="qa-btn" onclick="openDummyFeature('Calendar')">
                     <div class="qa-icon" style="color:var(--secondary); background:#fff3e0;">📅</div>
                     <span>Calendar /<br>Availability</span>
                 </button>
-                <button class="qa-btn">
+                <button class="qa-btn" onclick="openDummyFeature('Earnings')">
                     <div class="qa-icon" style="color:#4caf50; background:#e8f5e9;">💳</div>
                     <span>Earnings</span>
                 </button>
-                <button class="qa-btn">
+                <button class="qa-btn" onclick="openDummyFeature('Messages')">
                     <div class="qa-icon" style="color:#9c27b0; background:#f3e5f5;">💬<div class="badge-red" style="top:0; right:0;">2</div></div>
                     <span>Messages</span>
                 </button>
@@ -111,26 +111,33 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item">
+            <a href="index.html" class="nav-item">
                 <span class="nav-icon" style="color:var(--text-tertiary);">🗺️</span>
                 <span>Map</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="openDummyFeature('Bookings')">
                 <span class="nav-icon" style="color:var(--text-tertiary);">📅</span>
                 <span>Bookings</span>
             </a>
             <div class="fab-wrapper">
                 <button class="fab-btn" onclick="openCreateModal()">＋</button>
             </div>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="openDummyFeature('Messages')">
                 <span class="nav-icon" style="color:var(--text-tertiary); position:relative;">💬<div class="badge-red" style="top:-5px; right:-5px; border:none; width:14px; height:14px;">2</div></span>
                 <span>Inbox</span>
             </a>
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" onclick="openDummyFeature('Profile')">
                 <span class="nav-icon" style="color:var(--primary);">👤</span>
                 <span style="color:var(--primary);">Profile</span>
             </a>
         </nav>
+
+        <!-- Dummy Feature Modal (Bottom Sheet Component) -->
+        <div id="dummy-feature-modal" class="modal-overlay hidden">
+            <div class="bottom-sheet" id="dummy-feature-sheet">
+                <!-- Content injected here by JS -->
+            </div>
+        </div>
 
         <!-- Create Offer Modal -->
         <div id="create-modal" class="modal-overlay hidden">
