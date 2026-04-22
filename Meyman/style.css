@@ -122,8 +122,10 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 
 /* CUSTOMER APP SPECIFIC */
 .customer-app {
-    /* Realistic map background */
-    background: url('./map-bg.png') center top / cover no-repeat, #e8ede3;
+    background-color: #e8ede3; /* fallback */
+}
+.customer-app .container {
+    background-color: transparent;
 }
 
 .top-bar {
@@ -220,6 +222,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     height: 48px;
     background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="%23d32f2f" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/></svg>') center / contain no-repeat;
     cursor: pointer;
+    pointer-events: auto;
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     z-index: 5;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
