@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meyman - Experiences</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="customer-app">
+
+    <div class="container">
+        <!-- Main Top Bar -->
+        <header class="top-bar">
+            <div class="header-row">
+                <div class="logo-area">
+                    <div class="logo-icon">M</div>
+                    <span style="font-weight:700; font-size:1.1rem;">Meyman</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="font-size:0.85rem; font-weight:600; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">📍 Bishkek</div>
+                    <div style="font-size:0.85rem; font-weight:600; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">EN</div>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" placeholder="Search experiences, food, places...">
+            </div>
+
+            <div class="categories-scroll" id="category-tabs">
+                <div class="cat-pill active">All</div>
+                <div class="cat-pill">Food</div>
+                <div class="cat-pill">Stay</div>
+                <div class="cat-pill">Transport</div>
+                <div class="cat-pill">Events</div>
+                <div class="cat-pill">Services</div>
+            </div>
+            
+            <p class="motto">Your lifestyle is their experience <span style="font-size: 0.7em; opacity: 0.5; margin-left: 5px;">v1.1</span></p>
+        </header>
+
+        <!-- Interactive Map Layer (Dummy) -->
+        <div id="interactive-map" style="position:absolute; width:100%; height:100%;">
+            <!-- Map Pins injected here by JS -->
+        </div>
+
+        <!-- Floating Happening Now Cards -->
+        <section class="happening-now">
+            <h3 class="section-title">Happening Now 🔥</h3>
+            <div class="horizontal-feed" id="happening-feed">
+                <!-- Offer Cards injected here by JS -->
+            </div>
+        </section>
+
+        <!-- Detail Action Modal (Bottom Sheet Component) -->
+        <div id="booking-modal" class="modal-overlay hidden">
+            <div class="bottom-sheet" id="booking-sheet">
+                <!-- Details injected here by JS -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">🗺️</span>
+                <span>Map</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon" style="color:var(--primary);">➕</span>
+                <span>New</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📅</span>
+                <span>Bookings</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">💬</span>
+                <span>Inbox</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Core State Framework (ICF Compliant) -->
+    <script src="shared-state.js"></script>
+    <script src="customer.js"></script>
+</body>
+</html>
