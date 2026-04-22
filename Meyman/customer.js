@@ -176,6 +176,46 @@ function submitRequest() {
     }
 }
 
+// Dummy Feature Handlers for Hackathon MVP
+function openDummyFeature(featureName) {
+    var sheet = document.getElementById("dummy-feature-sheet");
+    var htmlContent = '<div class="sheet-handle"></div>';
+    htmlContent += '<div style="display:flex; justify-content:space-between; align-items:center;">';
+    htmlContent += '<h2 style="font-size:1.5rem; color:var(--text-primary);">' + featureName + '</h2>';
+    htmlContent += '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeDummyFeature()">✕</button>';
+    htmlContent += '</div>';
+    
+    if (featureName === 'Bookings') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Hiking in Ala Archa</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Tomorrow, 10:00 AM • 2 spots</div><div style="margin-top:8px;"><span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Confirmed</span></div></div>';
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Osh Bazaar Food Tour</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Next Saturday, 12:00 PM • 1 spot</div><div style="margin-top:8px;"><span style="background:#fff3e0; color:#ef6c00; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Pending Host</span></div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Inbox') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Aigul</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Looking forward to our trip tomorrow!</div></div><div style="width:10px; height:10px; background:var(--primary); border-radius:50%;"></div></div>';
+        htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">👩</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Beksultan</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Thanks for booking. Do you need...</div></div></div>';
+        htmlContent += '</div>';
+    } else if (featureName === 'Profile') {
+        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;">';
+        htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:2.5rem;">😎</div>';
+        htmlContent += '<div style="font-weight:700; font-size:1.2rem; color:var(--text-primary);">Hackathon Guest</div>';
+        htmlContent += '<div style="font-size:0.9rem; color:var(--text-secondary);">Joined April 2026</div>';
+        htmlContent += '</div>';
+        htmlContent += '<div style="margin-top:2rem; display:flex; flex-direction:column; gap:0.5rem;">';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Payment Methods <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Language (EN) <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--primary);">Log Out <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '</div>';
+    }
+
+    sheet.innerHTML = htmlContent;
+    document.getElementById("dummy-feature-modal").classList.remove("hidden");
+}
+
+function closeDummyFeature() {
+    document.getElementById("dummy-feature-modal").classList.add("hidden");
+}
+
 // Boot application
 window.onload = function() {
     initCustomerApp();

@@ -95,6 +95,13 @@
             </div>
         </div>
 
+        <!-- Dummy Feature Modal (Bottom Sheet Component) -->
+        <div id="dummy-feature-modal" class="modal-overlay hidden">
+            <div class="bottom-sheet" id="dummy-feature-sheet">
+                <!-- Content injected here by JS -->
+            </div>
+        </div>
+
         <!-- Navigation -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active">
@@ -105,15 +112,15 @@
                 <span class="nav-icon" style="color:var(--primary);">➕</span>
                 <span>New</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Bookings history will be available in the full release!')">
+            <a href="#" class="nav-item" onclick="openDummyFeature('Bookings')">
                 <span class="nav-icon">📅</span>
                 <span>Bookings</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('Inbox will be available in the full release!')">
+            <a href="#" class="nav-item" onclick="openDummyFeature('Inbox')">
                 <span class="nav-icon">💬</span>
                 <span>Inbox</span>
             </a>
-            <a href="#" class="nav-item" onclick="alert('User profile settings will be available in the full release!')">
+            <a href="#" class="nav-item" onclick="openDummyFeature('Profile')">
                 <span class="nav-icon">👤</span>
                 <span>Profile</span>
             </a>
