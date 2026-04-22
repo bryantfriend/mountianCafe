@@ -5,7 +5,8 @@ var STORAGE_KEY = "meyman_data_v1";
 function getInitialState() {
     return {
         offers: [],
-        bookings: []
+        bookings: [],
+        requests: []
     };
 }
 
@@ -82,6 +83,12 @@ function validateAction(actionType, payload) {
     if (actionType === "BOOK_OFFER") {
         return payload && payload.offerId !== undefined;
     }
+    if (actionType === "CREATE_REQUEST") {
+        return payload && payload.description && payload.category;
+    }
+    if (actionType === "FULFILL_REQUEST") {
+        return payload && payload.requestId !== undefined;
+    }
     return false;
 }
 
@@ -91,6 +98,10 @@ function normalizeAction(actionType, payload) {
         normalized.title = String(payload.title).trim();
         normalized.price = Number(payload.price) || 0;
         normalized.spots = Number(payload.spots) || 1;
+        normalized.category = String(payload.category).trim();
+    }
+    if (actionType === "CREATE_REQUEST") {
+        normalized.description = String(payload.description).trim();
         normalized.category = String(payload.category).trim();
     }
     return normalized;
@@ -111,6 +122,10 @@ function addContext(actionType, normalizedPayload) {
     }
     if (actionType === "BOOK_OFFER") {
         context.bookingId = "booking_" + Date.now();
+    }
+    if (actionType === "CREATE_REQUEST") {
+        context.requestId = "req_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        context.customerName = "Guest_" + Math.floor(Math.random() * 9000 + 1000);
     }
     return context;
 }
@@ -157,6 +172,31 @@ function processAction(actionType, currentState, context) {
             throw new Error("Offer not found or no spots available.");
         }
     }
+    else if (actionType === "CREATE_REQUEST") {
+        // Ensure requests array exists for old state versions
+        if (!newState.requests) newState.requests = [];
+        
+        newState.requests.push({
+            id: context.requestId,
+            description: context.description,
+            category: context.category,
+            customerName: context.customerName,
+            status: "pending",
+            timestamp: context.timestamp
+        });
+    }
+    else if (actionType === "FULFILL_REQUEST") {
+        if (!newState.requests) newState.requests = [];
+        var found = false;
+        for (var j = 0; j < newState.requests.length; j++) {
+            if (newState.requests[j].id === context.requestId) {
+                newState.requests[j].status = "fulfilled";
+                found = true;
+                break;
+            }
+        }
+        if (!found) throw new Error("Request not found.");
+    }
 
     return newState;
 }
@@ -167,6 +207,12 @@ function finalizeAction(actionType, processedState, context) {
     }
     if (actionType === "BOOK_OFFER") {
         return { success: true, bookingId: context.bookingId };
+    }
+    if (actionType === "CREATE_REQUEST") {
+        return { success: true, requestId: context.requestId };
+    }
+    if (actionType === "FULFILL_REQUEST") {
+        return { success: true };
     }
     return { success: true };
 }

@@ -141,6 +141,41 @@ function setupCategoryTabs() {
     }
 }
 
+// Request Modal Handlers
+function openRequestModal() {
+    document.getElementById("request-description").value = "";
+    document.getElementById("request-category").value = "Food";
+    document.getElementById("request-modal").classList.remove("hidden");
+}
+
+function closeRequestModal() {
+    document.getElementById("request-modal").classList.add("hidden");
+}
+
+function submitRequest() {
+    var desc = document.getElementById("request-description").value;
+    var cat = document.getElementById("request-category").value;
+    
+    if (!desc) {
+        alert("Please describe what you are looking for!");
+        return;
+    }
+    
+    var payload = {
+        description: desc,
+        category: cat
+    };
+    
+    var result = executeAction("CREATE_REQUEST", payload);
+    
+    if (result.success) {
+        closeRequestModal();
+        alert("Your request has been sent to locals nearby!");
+    } else {
+        alert("Failed to send request: " + result.error);
+    }
+}
+
 // Boot application
 window.onload = function() {
     initCustomerApp();

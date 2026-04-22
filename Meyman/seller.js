@@ -48,6 +48,41 @@ function refreshDashboard() {
         el.innerHTML = htmlString;
         listContainer.appendChild(el);
     }
+
+    // Render Customer Requests
+    var requestsContainer = document.getElementById("customer-requests-list");
+    requestsContainer.innerHTML = "";
+    
+    var pendingRequests = [];
+    if (currentState.requests) {
+        for (var k = 0; k < currentState.requests.length; k++) {
+            if (currentState.requests[k].status === "pending") {
+                pendingRequests.push(currentState.requests[k]);
+            }
+        }
+    }
+
+    if (pendingRequests.length === 0) {
+        requestsContainer.innerHTML = '<div class="empty-state">No pending customer requests right now.</div>';
+    } else {
+        for (var r = 0; r < pendingRequests.length; r++) {
+            var req = pendingRequests[r];
+            var reqEl = document.createElement("div");
+            reqEl.className = "list-item";
+            
+            var reqHtml = '<div style="display:flex; flex-direction:column; gap:6px;">' + 
+                '<div style="font-weight:700; color:var(--text-primary);">' + req.customerName + ' is looking for:</div>' +
+                '<div style="font-size:0.9rem; color:var(--text-secondary);">"' + req.description + '"</div>' +
+                '<div><span class="cat-pill" style="display:inline-block; padding:4px 8px; font-size:0.75rem; margin-top:4px;">' + req.category + '</span></div>' +
+            '</div>' +
+            '<div style="display:flex; align-items:center;">' +
+                '<button class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="fulfillRequest(\'' + req.id + '\')">Fulfill</button>' +
+            '</div>';
+            
+            reqEl.innerHTML = reqHtml;
+            requestsContainer.appendChild(reqEl);
+        }
+    }
 }
 
 // Modal Handlers
@@ -92,6 +127,16 @@ function submitNewOffer() {
         alert("Offer published successfully!");
     } else {
         alert("Failed to publish offer: " + result.error);
+    }
+}
+
+function fulfillRequest(requestId) {
+    var result = executeAction("FULFILL_REQUEST", { requestId: requestId });
+    if (result.success) {
+        refreshDashboard();
+        alert("You have offered to fulfill this request! The customer will be notified.");
+    } else {
+        alert("Failed to fulfill request: " + result.error);
     }
 }
 
