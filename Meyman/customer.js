@@ -61,8 +61,12 @@ function renderExploreFeed() {
     if(!feedContainer) return;
     feedContainer.innerHTML = "";
     
+    var filter = window.currentCategoryFilter || "All";
+    
     for (var i = 0; i < currentState.offers.length; i++) {
         var offer = currentState.offers[i];
+        if (filter !== "All" && offer.category !== filter) continue;
+
         var card = document.createElement("div");
         card.className = "explore-card";
         var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=600&q=80";
@@ -103,8 +107,11 @@ function renderMapAndFeed() {
         return;
     }
 
+    var filter = window.currentCategoryFilter || "All";
+
     for (var i = 0; i < currentState.offers.length; i++) {
         var offer = currentState.offers[i];
+        if (filter !== "All" && offer.category !== filter) continue;
 
         // Ensure spot count takes bookings into consideration for the customer view.
         var bookedCount = 0;
@@ -293,6 +300,12 @@ function setupCategoryTabs() {
         pills[i].onclick = function() {
             for (var j = 0; j < pills.length; j++) pills[j].classList.remove("active");
             this.classList.add("active");
+            
+            window.currentCategoryFilter = this.innerText.trim();
+            renderMapAndFeed();
+            if(!document.getElementById("view-explore").classList.contains("hidden")) {
+                renderExploreFeed();
+            }
         };
     }
 }
@@ -330,6 +343,7 @@ function submitRequest() {
     } else {
         alert("Failed to send request: " + result.error);
     }
+}
 
 // Review Modal Handlers
 function openReviewModal(offerId) {
@@ -370,7 +384,6 @@ function submitReview() {
     } else {
         alert("Failed to submit review: " + result.error);
     }
-}
 }
 
 // Dummy Feature Handlers for Hackathon MVP
@@ -414,8 +427,28 @@ function openDummyFeature(featureName) {
         htmlContent += '</div>';
     } else if (featureName === 'Inbox') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
-        htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Aigul</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Looking forward to our trip tomorrow!</div></div><div style="width:10px; height:10px; background:var(--primary); border-radius:50%;"></div></div>';
-        htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">👩</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Beksultan</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Thanks for booking. Do you need...</div></div></div>';
+        
+        var currentState = loadState();
+        var myBookings = currentState.bookings; // Real state bookings
+        
+        if (myBookings.length > 0) {
+            for (var b = 0; b < myBookings.length; b++) {
+                var booking = myBookings[b];
+                var offerDetail = null;
+                for (var o = 0; o < currentState.offers.length; o++) {
+                    if (currentState.offers[o].id === booking.offerId) {
+                        offerDetail = currentState.offers[o];
+                        break;
+                    }
+                }
+                if (offerDetail) {
+                    htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">' + offerDetail.hostName + '</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Thanks for booking ' + offerDetail.title + '! See you soon.</div></div><div style="width:10px; height:10px; background:var(--primary); border-radius:50%;"></div></div>';
+                }
+            }
+        } else {
+            htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Meyman Support</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Welcome to Meyman! Explore our local experiences.</div></div></div>';
+        }
+        
         htmlContent += '</div>';
     } else if (featureName === 'Profile') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;">';
