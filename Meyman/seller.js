@@ -12,8 +12,21 @@ function refreshDashboard() {
     var activeOffers = currentState.offers.length;
     var totalBookings = currentState.bookings.length;
 
-    document.getElementById("active-offers-count").innerText = activeOffers;
-    document.getElementById("total-bookings-count").innerText = totalBookings;
+    // Calculate Review Stats
+    var totalReviews = 0;
+    var sumRatings = 0;
+    if (currentState.reviews && currentState.reviews.length > 0) {
+        totalReviews = currentState.reviews.length;
+        for (var idx = 0; idx < totalReviews; idx++) {
+            sumRatings += currentState.reviews[idx].rating;
+        }
+    }
+    var avgRating = totalReviews > 0 ? (sumRatings / totalReviews).toFixed(1) : "0.0";
+
+    document.getElementById("stat-active-offers").innerText = activeOffers;
+    document.getElementById("stat-total-bookings").innerText = totalBookings;
+    document.getElementById("stat-avg-rating").innerText = avgRating;
+    document.getElementById("stat-review-count").innerText = "(" + totalReviews + ")";
 
     // Render Offers List
     var listContainer = document.getElementById("host-offers-list");
@@ -21,63 +34,69 @@ function refreshDashboard() {
 
     if (activeOffers === 0) {
         listContainer.innerHTML = '<div class="empty-state">You have no active offers.<br><br>Click the Create button to get started!</div>';
-        return;
-    }
+    } else {
+        for (var i = 0; i < currentState.offers.length; i++) {
+            var offer = currentState.offers[i];
+            
+            var el = document.createElement("div");
+            el.className = "offer-card";
+            
+            // Count bookings for this offer
+            var bookingsCount = 0;
+            for (var j = 0; j < currentState.bookings.length; j++) {
+                if (currentState.bookings[j].offerId === offer.id) bookingsCount++;
+            }
 
-    for (var i = 0; i < currentState.offers.length; i++) {
-        var offer = currentState.offers[i];
-        
-        var el = document.createElement("div");
-        el.className = "list-item";
-        
-        // Count bookings for this offer
-        var bookingsCount = 0;
-        for (var j = 0; j < currentState.bookings.length; j++) {
-            if (currentState.bookings[j].offerId === offer.id) bookingsCount++;
+            var htmlString = 
+                '<div class="offer-card-img" style="background-image:url(\'https://images.unsplash.com/photo-1541843666579-166fb9c072eb?auto=format&fit=crop&w=400&q=80\');">' +
+                    '<div class="live-badge">LIVE</div>' +
+                '</div>' +
+                '<div class="offer-card-body">' +
+                    '<div class="offer-title">' + offer.title + '</div>' +
+                    '<div class="offer-price-row">' +
+                        '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
+                    '</div>' +
+                    '<div class="offer-meta" style="display:flex; justify-content:space-between; margin-top:8px;">' +
+                        '<div style="display:flex; align-items:center; gap:4px;">📅 Upcoming</div>' +
+                        '<div style="display:flex; align-items:center; gap:4px;">👥 ' + bookingsCount + '/' + offer.spots + ' booked</div>' +
+                    '</div>' +
+                '</div>';
+            
+            el.innerHTML = htmlString;
+            listContainer.appendChild(el);
         }
-
-        var htmlString = '<div style="display:flex; flex-direction:column; gap:6px;">' + 
-            '<div style="font-weight:700;">' + offer.title + '</div>' +
-            '<div class="text-muted">' + offer.price + ' KGS • ' + offer.spots + ' spots left</div>' +
-        '</div>' +
-        '<div style="text-align:right;">' +
-            '<div class="spots-badge" style="display:inline-block; margin-bottom:4px; background:var(--bg-main); border:1px solid var(--border-darker);">' + bookingsCount + ' Booked</div>' +
-            '<div class="text-small" style="color:var(--primary); font-weight:600;">LIVE</div>' +
-        '</div>';
-        
-        el.innerHTML = htmlString;
-        listContainer.appendChild(el);
     }
 
     // Render Customer Requests
     var requestsContainer = document.getElementById("customer-requests-list");
     requestsContainer.innerHTML = "";
     
-    var pendingRequests = [];
-    if (currentState.requests) {
-        for (var k = 0; k < currentState.requests.length; k++) {
-            if (currentState.requests[k].status === "pending") {
-                pendingRequests.push(currentState.requests[k]);
-            }
-        }
-    }
+    var requests = currentState.requests || [];
 
-    if (pendingRequests.length === 0) {
-        requestsContainer.innerHTML = '<div class="empty-state">No pending customer requests right now.</div>';
+    if (requests.length === 0) {
+        requestsContainer.innerHTML = '<div class="empty-state">No customer requests right now.</div>';
     } else {
-        for (var r = 0; r < pendingRequests.length; r++) {
-            var req = pendingRequests[r];
+        // Reverse iterate to show newest first
+        for (var r = requests.length - 1; r >= 0; r--) {
+            var req = requests[r];
             var reqEl = document.createElement("div");
-            reqEl.className = "list-item";
+            reqEl.className = "request-item";
             
-            var reqHtml = '<div style="display:flex; flex-direction:column; gap:6px;">' + 
-                '<div style="font-weight:700; color:var(--text-primary);">' + req.customerName + ' is looking for:</div>' +
-                '<div style="font-size:0.9rem; color:var(--text-secondary);">"' + req.description + '"</div>' +
-                '<div><span class="cat-pill" style="display:inline-block; padding:4px 8px; font-size:0.75rem; margin-top:4px;">' + req.category + '</span></div>' +
-            '</div>' +
-            '<div style="display:flex; align-items:center;">' +
-                '<button class="btn btn-primary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="fulfillRequest(\'' + req.id + '\')">Fulfill</button>' +
-            '</div>';
+            var isPending = req.status === "pending";
+            var statusHtml = isPending ? '<div class="status-pill pending">Pending</div>' : '<div class="status-pill confirmed">Confirmed</div>';
+            var actionHtml = isPending ? '<button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem; border-color:var(--secondary); color:var(--secondary);" onclick="fulfillRequest(\'' + req.id + '\')">Accept</button>' : '<div class="req-chevron">></div>';
+            
+            var reqHtml = 
+                '<div class="req-avatar" style="background-image:url(\'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=150&q=80\');"></div>' +
+                '<div class="req-info">' +
+                    '<div class="req-name">' + req.customerName + ' <span style="font-size:0.8rem;">🌍</span></div>' +
+                    '<div class="req-desc">"' + req.description + '"</div>' +
+                    '<div class="req-meta">Requested on ' + new Date(req.timestamp).toLocaleDateString() + '</div>' +
+                '</div>' +
+                '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">' +
+                    statusHtml +
+                    actionHtml +
+                '</div>';
             
             reqEl.innerHTML = reqHtml;
             requestsContainer.appendChild(reqEl);

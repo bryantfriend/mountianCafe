@@ -102,6 +102,38 @@
             </div>
         </div>
 
+        <!-- Review Modal (Bottom Sheet Component) -->
+        <div id="review-modal" class="modal-overlay hidden">
+            <div class="bottom-sheet">
+                <div class="sheet-handle"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="font-size:1.5rem; color:var(--text-primary);">Leave a Review</h2>
+                    <button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeReviewModal()">✕</button>
+                </div>
+                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1rem;">How was your experience? Your feedback helps the community!</p>
+                
+                <input type="hidden" id="review-offer-id">
+                
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Rating (1-5)</label>
+                    <select id="review-rating" style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; outline:none;">
+                        <option value="5">⭐⭐⭐⭐⭐ (5) Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ (4) Very Good</option>
+                        <option value="3">⭐⭐⭐ (3) Average</option>
+                        <option value="2">⭐⭐ (2) Poor</option>
+                        <option value="1">⭐ (1) Terrible</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Your Comment</label>
+                    <textarea id="review-comment" rows="3" placeholder="Tell us what you liked or how the host can improve..." style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; resize:none; outline:none; font-family:inherit;"></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="width:100%; padding:1rem;" onclick="submitReview()">Submit Review</button>
+            </div>
+        </div>
+
         <!-- Navigation -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active">

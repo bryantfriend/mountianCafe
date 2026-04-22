@@ -8,44 +8,129 @@
 </head>
 <body class="seller-app">
 
-    <div class="container" style="background-color: var(--bg-main);">
+    <div class="container">
+        <!-- Top Header -->
         <header class="seller-header">
-            <div>
-                <h1>Host Dashboard</h1>
-                <p class="motto">Your lifestyle is their experience <span style="font-size: 0.7em; opacity: 0.5; margin-left: 5px;">v1.1</span></p>
+            <div style="font-size:1.5rem; color:var(--text-primary); font-weight:bold;">☰</div>
+            <div class="seller-logo">Meyman</div>
+            <div class="bell-icon">
+                🔔
+                <div class="badge-red">2</div>
             </div>
-            <div class="host-avatar">🧑</div>
         </header>
 
         <section class="seller-content">
-            <div class="dashboard-metrics">
-                <div class="metric-card">
-                    <h4>Active Offers</h4>
-                    <div class="value" id="active-offers-count">0</div>
+            <!-- Hero Section -->
+            <div class="seller-hero">
+                <div class="seller-hero-content">
+                    <h1>Salam, Aigul! 👋</h1>
+                    <div class="location">📍 Bishkek, Kyrgyzstan</div>
                 </div>
-                <div class="metric-card">
-                    <h4>Bookings</h4>
-                    <div class="value" id="total-bookings-count">0</div>
+                <div class="seller-avatar"></div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon red">🛍️</div>
+                        Active Offers
+                    </div>
+                    <div class="stat-value" id="stat-active-offers">0</div>
+                    <div class="stat-trend">↑ 2 this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange">📅</div>
+                        Total Bookings
+                    </div>
+                    <div class="stat-value" id="stat-total-bookings">0</div>
+                    <div class="stat-trend">↑ 5 this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">💳</div>
+                        Total Earnings
+                    </div>
+                    <div class="stat-value">18,450 <span>KGS</span></div>
+                    <div class="stat-trend">↑ 2,300 this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">⭐</div>
+                        Total Reviews
+                    </div>
+                    <div class="stat-value" id="stat-avg-rating">0.0</div>
+                    <div class="stat-stars">
+                        ★★★★★ <span id="stat-review-count">(0)</span>
+                    </div>
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h3 class="section-title">Your Offers</h3>
-                <button class="btn btn-primary" style="padding: 0.5rem 1rem;" onclick="openCreateModal()">+ Create</button>
+            <!-- Your Offers -->
+            <div class="section-header">
+                <h3>Your Offers</h3>
+                <a href="#" class="view-all">View all</a>
             </div>
-
-            <div id="host-offers-list">
+            <div class="horizontal-feed" id="host-offers-list" style="padding-top:0;">
                 <!-- Offers will be rendered here -->
             </div>
 
-            <div style="margin-top:2rem; margin-bottom:1rem;">
-                <h3 class="section-title">Customer Requests</h3>
+            <!-- Quick Actions -->
+            <div class="section-header" style="margin-top:0.5rem;">
+                <h3>Quick Actions</h3>
             </div>
-            
-            <div id="customer-requests-list">
+            <div class="quick-actions">
+                <button class="qa-btn" onclick="openCreateModal()">
+                    <div class="qa-icon red">＋</div>
+                    <span>Create New<br>Offer</span>
+                </button>
+                <button class="qa-btn">
+                    <div class="qa-icon" style="color:var(--secondary); background:#fff3e0;">📅</div>
+                    <span>Calendar /<br>Availability</span>
+                </button>
+                <button class="qa-btn">
+                    <div class="qa-icon" style="color:#4caf50; background:#e8f5e9;">💳</div>
+                    <span>Earnings</span>
+                </button>
+                <button class="qa-btn">
+                    <div class="qa-icon" style="color:#9c27b0; background:#f3e5f5;">💬<div class="badge-red" style="top:0; right:0;">2</div></div>
+                    <span>Messages</span>
+                </button>
+            </div>
+
+            <!-- Customer Requests -->
+            <div class="section-header" style="margin-top:0.5rem;">
+                <h3>Customer Requests</h3>
+                <a href="#" class="view-all">View all</a>
+            </div>
+            <div class="requests-list" id="customer-requests-list">
                 <!-- Requests will be rendered here -->
             </div>
         </section>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item">
+                <span class="nav-icon" style="color:var(--text-tertiary);">🗺️</span>
+                <span>Map</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon" style="color:var(--text-tertiary);">📅</span>
+                <span>Bookings</span>
+            </a>
+            <div class="fab-wrapper">
+                <button class="fab-btn" onclick="openCreateModal()">＋</button>
+            </div>
+            <a href="#" class="nav-item">
+                <span class="nav-icon" style="color:var(--text-tertiary); position:relative;">💬<div class="badge-red" style="top:-5px; right:-5px; border:none; width:14px; height:14px;">2</div></span>
+                <span>Inbox</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="nav-icon" style="color:var(--primary);">👤</span>
+                <span style="color:var(--primary);">Profile</span>
+            </a>
+        </nav>
 
         <!-- Create Offer Modal -->
         <div id="create-modal" class="modal-overlay hidden">

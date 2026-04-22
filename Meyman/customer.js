@@ -174,6 +174,47 @@ function submitRequest() {
     } else {
         alert("Failed to send request: " + result.error);
     }
+
+// Review Modal Handlers
+function openReviewModal(offerId) {
+    document.getElementById("review-offer-id").value = offerId;
+    document.getElementById("review-rating").value = "5";
+    document.getElementById("review-comment").value = "";
+    
+    // Close the dummy sheet if it's open
+    closeDummyFeature();
+    document.getElementById("review-modal").classList.remove("hidden");
+}
+
+function closeReviewModal() {
+    document.getElementById("review-modal").classList.add("hidden");
+}
+
+function submitReview() {
+    var offerId = document.getElementById("review-offer-id").value;
+    var rating = document.getElementById("review-rating").value;
+    var comment = document.getElementById("review-comment").value;
+    
+    if (!comment) {
+        alert("Please write a short comment for your review!");
+        return;
+    }
+    
+    var payload = {
+        offerId: offerId,
+        rating: rating,
+        comment: comment
+    };
+    
+    var result = executeAction("CREATE_REVIEW", payload);
+    
+    if (result.success) {
+        closeReviewModal();
+        alert("Thank you! Your review has been published.");
+    } else {
+        alert("Failed to submit review: " + result.error);
+    }
+}
 }
 
 // Dummy Feature Handlers for Hackathon MVP
@@ -186,9 +227,34 @@ function openDummyFeature(featureName) {
     htmlContent += '</div>';
     
     if (featureName === 'Bookings') {
+        var currentState = loadState();
+        var myBookings = currentState.bookings; // Real state bookings
+        
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
-        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Hiking in Ala Archa</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Tomorrow, 10:00 AM • 2 spots</div><div style="margin-top:8px;"><span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Confirmed</span></div></div>';
-        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Osh Bazaar Food Tour</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Next Saturday, 12:00 PM • 1 spot</div><div style="margin-top:8px;"><span style="background:#fff3e0; color:#ef6c00; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Pending Host</span></div></div>';
+        
+        for (var b = 0; b < myBookings.length; b++) {
+            var booking = myBookings[b];
+            var offerDetail = null;
+            for (var o = 0; o < currentState.offers.length; o++) {
+                if (currentState.offers[o].id === booking.offerId) {
+                    offerDetail = currentState.offers[o];
+                    break;
+                }
+            }
+            if (offerDetail) {
+                htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);">';
+                htmlContent += '<div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">' + offerDetail.title + '</div>';
+                htmlContent += '<div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Booked on ' + new Date(booking.timestamp).toLocaleDateString() + '</div>';
+                htmlContent += '<div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">';
+                htmlContent += '<span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Confirmed</span>';
+                htmlContent += '<button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openReviewModal(\'' + offerDetail.id + '\')">Leave Review</button>';
+                htmlContent += '</div></div>';
+            }
+        }
+        
+        // Static dummy past booking
+        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Hiking in Ala Archa</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Past Experience</div><div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;"><span style="background:#e0e0e0; color:var(--text-secondary); padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Completed</span><button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openReviewModal(\'dummy_offer_1\')">Leave Review</button></div></div>';
+        
         htmlContent += '</div>';
     } else if (featureName === 'Inbox') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';

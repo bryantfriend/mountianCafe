@@ -6,7 +6,8 @@ function getInitialState() {
     return {
         offers: [],
         bookings: [],
-        requests: []
+        requests: [],
+        reviews: []
     };
 }
 
@@ -89,6 +90,9 @@ function validateAction(actionType, payload) {
     if (actionType === "FULFILL_REQUEST") {
         return payload && payload.requestId !== undefined;
     }
+    if (actionType === "CREATE_REVIEW") {
+        return payload && payload.offerId && payload.rating && payload.comment;
+    }
     return false;
 }
 
@@ -103,6 +107,10 @@ function normalizeAction(actionType, payload) {
     if (actionType === "CREATE_REQUEST") {
         normalized.description = String(payload.description).trim();
         normalized.category = String(payload.category).trim();
+    }
+    if (actionType === "CREATE_REVIEW") {
+        normalized.rating = Math.min(Math.max(Number(payload.rating) || 5, 1), 5);
+        normalized.comment = String(payload.comment).trim();
     }
     return normalized;
 }
@@ -125,6 +133,10 @@ function addContext(actionType, normalizedPayload) {
     }
     if (actionType === "CREATE_REQUEST") {
         context.requestId = "req_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        context.customerName = "Guest_" + Math.floor(Math.random() * 9000 + 1000);
+    }
+    if (actionType === "CREATE_REVIEW") {
+        context.reviewId = "rev_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
         context.customerName = "Guest_" + Math.floor(Math.random() * 9000 + 1000);
     }
     return context;
@@ -197,6 +209,17 @@ function processAction(actionType, currentState, context) {
         }
         if (!found) throw new Error("Request not found.");
     }
+    else if (actionType === "CREATE_REVIEW") {
+        if (!newState.reviews) newState.reviews = [];
+        newState.reviews.push({
+            id: context.reviewId,
+            offerId: context.offerId,
+            rating: context.rating,
+            comment: context.comment,
+            customerName: context.customerName,
+            timestamp: context.timestamp
+        });
+    }
 
     return newState;
 }
@@ -213,6 +236,9 @@ function finalizeAction(actionType, processedState, context) {
     }
     if (actionType === "FULFILL_REQUEST") {
         return { success: true };
+    }
+    if (actionType === "CREATE_REVIEW") {
+        return { success: true, reviewId: context.reviewId };
     }
     return { success: true };
 }
