@@ -142,4 +142,18 @@ function setupCategoryTabs() {
 }
 
 // Boot application
-window.onload = initCustomerApp;
+window.onload = function() {
+    initCustomerApp();
+    
+    // Initialize 2GIS Map Background
+    if (typeof DG !== 'undefined') {
+        DG.then(function() {
+            DG.map('map-bg-layer', {
+                center: [42.8746, 74.5698], // Bishkek center
+                zoom: 13,
+                zoomControl: false,
+                fullscreenControl: false
+            });
+        });
+    }
+};
