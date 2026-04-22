@@ -208,6 +208,138 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     border-color: var(--text-primary);
 }
 
+/* View Toggles & Tabs */
+.toggle-container {
+    display: flex;
+    background: rgba(118, 118, 128, 0.12);
+    border-radius: 20px;
+    padding: 3px;
+    margin: 0 auto;
+    width: 220px;
+}
+.toggle-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.toggle-btn.active {
+    background: white;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-tab {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1;
+}
+.view-tab.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+}
+.view-tab.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    z-index: 2;
+}
+
+/* Explore Feed */
+.explore-content {
+    height: 100%;
+    overflow-y: auto;
+    padding-top: 170px; /* Space for top bar */
+    padding-bottom: 100px; /* Space for bottom nav */
+    scrollbar-width: none;
+}
+.explore-content::-webkit-scrollbar { display: none; }
+
+.vertical-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0 1.25rem 2rem;
+}
+
+.explore-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    height: 420px;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color: var(--border-color);
+}
+.explore-card:active {
+    transform: scale(0.97);
+}
+.explore-card-img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+.explore-card-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 100%);
+    padding: 3rem 1.25rem 1.25rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.explore-card-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.explore-card-meta {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.explore-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 0.5rem;
+}
+.explore-card-price {
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+.explore-card-price span {
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+/* Category Sections */
+.category-section {
+    margin-bottom: 2rem;
+}
+.category-section h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    padding-left: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
 /* Map Elements */
 #interactive-map {
     position: absolute;
@@ -411,6 +543,10 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     width: 48px; height: 6px; border-radius: 6px;
     background: var(--border-color);
     margin: 0 auto 1rem;
+}
+
+.bottom-sheet.dragging {
+    transition: none; /* remove transition during drag */
 }
 
 /* SELLER APP SPECIFIC */

@@ -22,7 +22,13 @@
                 </div>
             </div>
 
-            <div class="search-bar">
+            <!-- View Toggle -->
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="btn-tab-map" onclick="switchTab('map')">Map</button>
+                <button class="toggle-btn" id="btn-tab-explore" onclick="switchTab('explore')">Explore</button>
+            </div>
+
+            <div class="search-bar" style="margin-top:0.75rem;">
                 <span>🔍</span>
                 <input type="text" placeholder="Search experiences, food, places...">
             </div>
@@ -39,25 +45,47 @@
             <p class="motto">Your lifestyle is their experience</p>
         </header>
 
-        <!-- 2GIS Map Background -->
-        <div class="map-wrapper" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: none;">
-            <div id="map-bg-layer" style="width: 100%; height: 100%;"></div>
-        </div>
-
-        <!-- Interactive Map Layer -->
-        <div id="interactive-map" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index: 1; pointer-events:none;">
-            <!-- Map Pins injected here by JS -->
-        </div>
-
-        <!-- Floating Happening Now Cards -->
-        <section class="happening-now">
-            <h3 class="section-title">Happening Now 🔥</h3>
-            <div class="horizontal-feed" id="happening-feed">
-                <!-- Offer Cards injected here by JS -->
+        <!-- VIEW: MAP -->
+        <div id="view-map" class="view-tab active">
+            <!-- 2GIS Map Background -->
+            <div class="map-wrapper" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: none;">
+                <div id="map-bg-layer" style="width: 100%; height: 100%;"></div>
             </div>
-        </section>
 
-        <!-- Detail Action Modal (Bottom Sheet Component) -->
+            <!-- Interactive Map Layer -->
+            <div id="interactive-map" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index: 1; pointer-events:none;">
+                <!-- Map Pins injected here by JS -->
+            </div>
+
+            <!-- Floating Happening Now Cards -->
+            <section class="happening-now">
+                <h3 class="section-title">Happening Now 🔥</h3>
+                <div class="horizontal-feed" id="happening-feed">
+                    <!-- Offer Cards injected here by JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW: EXPLORE -->
+        <div id="view-explore" class="view-tab hidden">
+            <div class="explore-content">
+                <div class="category-section">
+                    <h3>🍽️ Eat Like a Local</h3>
+                    <div class="horizontal-feed" id="explore-cat-food"></div>
+                </div>
+                <div class="category-section">
+                    <h3>🏔️ Outdoor Adventures</h3>
+                    <div class="horizontal-feed" id="explore-cat-outdoors"></div>
+                </div>
+                
+                <h3 class="feed-title" style="padding:0 1.25rem 0.5rem; font-weight:800; font-size:1.4rem;">Discover</h3>
+                <div id="explore-vertical-feed" class="vertical-feed">
+                    <!-- Immersive vertical cards injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Action Modal (Draggable Bottom Sheet) -->
         <div id="booking-modal" class="modal-overlay hidden">
             <div class="bottom-sheet" id="booking-sheet">
                 <!-- Details injected here by JS -->

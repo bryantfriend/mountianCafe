@@ -3,6 +3,91 @@
 function initCustomerApp() {
     renderMapAndFeed();
     setupCategoryTabs();
+    setupBottomSheetDrag();
+}
+
+function switchTab(tabId) {
+    var tabs = ["map", "explore"];
+    for (var i = 0; i < tabs.length; i++) {
+        var btn = document.getElementById("btn-tab-" + tabs[i]);
+        var view = document.getElementById("view-" + tabs[i]);
+        if (btn) btn.classList.remove("active");
+        if (view) {
+            view.classList.add("hidden");
+            view.classList.remove("active");
+        }
+    }
+    
+    var activeBtn = document.getElementById("btn-tab-" + tabId);
+    var activeView = document.getElementById("view-" + tabId);
+    if (activeBtn) activeBtn.classList.add("active");
+    if (activeView) {
+        activeView.classList.remove("hidden");
+        activeView.classList.add("active");
+    }
+
+    if (tabId === "explore") {
+        renderExploreFeed();
+    }
+}
+
+function renderExploreFeed() {
+    var currentState = loadState();
+    
+    // Render Categories
+    var cats = ["food", "outdoors"];
+    var catsFilter = ["Food", "Events"]; 
+    for (var c=0; c<cats.length; c++) {
+        var container = document.getElementById("explore-cat-" + cats[c]);
+        if (!container) continue;
+        container.innerHTML = "";
+        for (var i=0; i<currentState.offers.length; i++) {
+            var offer = currentState.offers[i];
+            if (offer.category === catsFilter[c] || (c===1 && offer.category==="Transport")) {
+                var card = document.createElement("div");
+                card.className = "offer-card";
+                card.style.minWidth = "220px";
+                card.style.width = "220px";
+                var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
+                card.innerHTML = '<div class="offer-card-img" style="background-image:url(\''+imgUrl+'\'); height:120px;"></div><div class="offer-card-body" style="padding:0.8rem;"><div class="offer-title" style="font-size:1rem;">'+offer.title+'</div><div class="offer-price-row" style="margin-top:0.2rem;"><div class="offer-price" style="font-size:1rem;">'+offer.price+' KGS</div></div></div>';
+                card.onclick = (function(idx) { return function() { openOfferModal(idx); }; })(i);
+                container.appendChild(card);
+            }
+        }
+    }
+
+    // Render Vertical Feed
+    var feedContainer = document.getElementById("explore-vertical-feed");
+    if(!feedContainer) return;
+    feedContainer.innerHTML = "";
+    
+    for (var i = 0; i < currentState.offers.length; i++) {
+        var offer = currentState.offers[i];
+        var card = document.createElement("div");
+        card.className = "explore-card";
+        var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=600&q=80";
+        
+        var bookedCount = 0;
+        for (var j = 0; j < currentState.bookings.length; j++) {
+            if (currentState.bookings[j].offerId === offer.id) bookedCount++;
+        }
+        var availableSpots = offer.spots - bookedCount;
+        var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
+
+        card.innerHTML = 
+            '<div class="explore-card-img" style="background-image: url(\'' + imgUrl + '\');"></div>' +
+            '<div class="explore-card-overlay">' +
+                '<div class="explore-card-meta">📍 200m away • ⭐ 4.9 • 2 hours</div>' +
+                '<div class="explore-card-title">' + offer.title + '</div>' +
+                '<div class="explore-card-footer">' +
+                    '<div class="explore-card-price">' + offer.price + ' <span>KGS</span></div>' +
+                    '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); bookOffer(\''+offer.id+'\')">Book Now</button>' +
+                '</div>' +
+            '</div>';
+        
+        card.onclick = (function(idx) { return function() { openOfferModal(idx); }; })(i);
+        feedContainer.appendChild(card);
+    }
 }
 
 function renderMapAndFeed() {
@@ -87,9 +172,12 @@ function openOfferModal(index) {
     }
     var availableSpots = offer.spots - bookedCount;
 
+    var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
+
     var sheet = document.getElementById("booking-sheet");
     sheet.innerHTML = 
-        '<div class="sheet-handle"></div>' +
+        '<div class="sheet-handle" id="booking-sheet-handle"></div>' +
+        '<div style="width:100%; height:180px; border-radius:var(--radius-md); background:url(\''+imgUrl+'\') center/cover; margin-bottom:1rem;"></div>' +
         '<div style="display:flex; justify-content:space-between; align-items:center;">' +
             '<div class="offer-host"><div class="host-avatar">🧑</div> <span style="font-weight:700; color:var(--text-primary); margin-left:8px;">' + offer.hostName + '</span></div>' +
             '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeOfferModal()">✕</button>' +
@@ -108,10 +196,56 @@ function openOfferModal(index) {
         '</div>';
 
     document.getElementById("booking-modal").classList.remove("hidden");
+    
+    // Set default half-visible state
+    sheet.style.transform = 'translateY(30%)';
+    setTimeout(function() {
+        sheet.style.transform = 'translateY(30%)';
+    }, 10);
+}
+
+var currentY = 0;
+function setupBottomSheetDrag() {
+    var sheet = document.getElementById("booking-sheet");
+    var startY = 0;
+    var currentTransform = 0;
+
+    sheet.addEventListener("touchstart", function(e) {
+        startY = e.touches[0].clientY;
+        var style = window.getComputedStyle(sheet);
+        var matrix = new WebKitCSSMatrix(style.transform);
+        currentTransform = matrix.m42;
+        sheet.classList.add("dragging");
+    });
+
+    sheet.addEventListener("touchmove", function(e) {
+        var deltaY = e.touches[0].clientY - startY;
+        var newY = currentTransform + deltaY;
+        if (newY < 0) newY = 0; // Don't drag past fully open
+        sheet.style.transform = 'translateY(' + newY + 'px)';
+        currentY = newY;
+    });
+
+    sheet.addEventListener("touchend", function(e) {
+        sheet.classList.remove("dragging");
+        // Snap logic
+        var threshold = window.innerHeight * 0.2;
+        if (currentY > threshold * 2) {
+            closeOfferModal();
+        } else if (currentY > threshold) {
+            sheet.style.transform = 'translateY(30%)'; // Snap half
+        } else {
+            sheet.style.transform = 'translateY(0%)'; // Snap full
+        }
+    });
 }
 
 function closeOfferModal() {
-    document.getElementById("booking-modal").classList.add("hidden");
+    var sheet = document.getElementById("booking-sheet");
+    sheet.style.transform = 'translateY(100%)';
+    setTimeout(function() {
+        document.getElementById("booking-modal").classList.add("hidden");
+    }, 300); // match transition duration
 }
 
 function bookOffer(offerId) {
