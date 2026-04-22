@@ -159,8 +159,6 @@ function fulfillRequest(requestId) {
     }
 }
 
-}
-
 // Dummy Feature Handlers for Host App Hackathon MVP
 function openDummyFeature(featureName) {
     var modal = document.getElementById("dummy-feature-modal");
