@@ -3,6 +3,7 @@
 function initCustomerApp() {
     renderMapAndFeed();
     setupCategoryTabs();
+    setupNeedNowTabs();
     setupBottomSheetDrag();
 }
 
@@ -112,6 +113,79 @@ function openOfferModalById(offerId) {
     if (index >= 0) openOfferModal(index);
 }
 
+function findOfferInState(state, offerId) {
+    for (var i = 0; i < state.offers.length; i++) {
+        if (state.offers[i].id === offerId) return state.offers[i];
+    }
+    return null;
+}
+
+function offerMatchesNeed(offer, need) {
+    if (!need) return true;
+    var haystack = [
+        offer.title || "",
+        offer.category || "",
+        (offer.tags || []).join(" ")
+    ].join(" ").toLowerCase();
+
+    if (need === "Food") return offer.category === "Food" || haystack.indexOf("food") !== -1 || haystack.indexOf("cook") !== -1;
+    if (need === "Shower") return offer.category === "Essentials" && haystack.indexOf("shower") !== -1;
+    if (need === "Laundry") return offer.category === "Essentials" && (haystack.indexOf("laundry") !== -1 || haystack.indexOf("water") !== -1);
+    if (need === "Charge") return offer.category === "Essentials" && (haystack.indexOf("charging") !== -1 || haystack.indexOf("charge") !== -1);
+    if (need === "Transport") return offer.category === "Transport" || haystack.indexOf("ride") !== -1 || haystack.indexOf("car") !== -1 || haystack.indexOf("transport") !== -1;
+    return true;
+}
+
+function offerVisibleForFilters(offer) {
+    var categoryFilter = window.currentCategoryFilter || "All";
+    var needFilter = window.currentNeedFilter || "";
+
+    if (needFilter && !offerMatchesNeed(offer, needFilter)) return false;
+    if (!needFilter && categoryFilter !== "All" && offer.category !== categoryFilter) return false;
+
+    return true;
+}
+
+function getBookingTimeLabel(booking) {
+    var date = new Date(booking.timestamp);
+    var today = new Date();
+    if (date.toDateString() === today.toDateString()) {
+        return "Booked today, " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    return "Booked " + date.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+function renderBookingCard(booking, offer) {
+    var liveHtml = offer.isLive ? '<span class="status-pill live-status">LIVE</span>' : '<span class="status-pill confirmed">Confirmed</span>';
+    var firstTag = offer.tags && offer.tags.length ? '<span class="tag">' + offer.tags[0] + '</span>' : "";
+    var startText = offer.isLive ? "Available now" : (offer.startTime || "Starting soon");
+
+    return '' +
+        '<article class="booking-card">' +
+            '<div class="booking-card-top">' +
+                '<div class="booking-main">' +
+                    '<div class="booking-title">' + offer.title + '</div>' +
+                    '<div class="booking-time">' + getBookingTimeLabel(booking) + '</div>' +
+                '</div>' +
+                liveHtml +
+            '</div>' +
+            '<div class="host-row booking-host">' +
+                '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
+                '<div class="host-copy">' +
+                    '<div class="host-name">' + offer.hostName + '</div>' +
+                    '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="booking-footer">' +
+                '<div>' +
+                    '<div class="availability-line ' + (offer.isLive ? "is-live" : "") + '">' + startText + '</div>' +
+                    '<div class="tag-row">' + firstTag + '</div>' +
+                '</div>' +
+                '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">Review</button>' +
+            '</div>' +
+        '</article>';
+}
+
 function renderExploreFeed() {
     var currentState = loadState();
     var sortedOffers = getSortedOffers(currentState.offers);
@@ -146,7 +220,7 @@ function renderExploreFeed() {
     
     for (var i = 0; i < sortedOffers.length; i++) {
         var offer = sortedOffers[i];
-        if (filter !== "All" && offer.category !== filter) continue;
+        if (!offerVisibleForFilters(offer)) continue;
 
         var card = document.createElement("div");
         card.className = "explore-card" + (offer.isLive ? " live-card" : "");
@@ -204,7 +278,7 @@ function renderMapAndFeed() {
 
     for (var i = 0; i < sortedOffers.length; i++) {
         var offer = sortedOffers[i];
-        if (filter !== "All" && offer.category !== filter) continue;
+        if (!offerVisibleForFilters(offer)) continue;
 
         // Ensure spot count takes bookings into consideration for the customer view.
         var bookedCount = 0;
@@ -345,10 +419,12 @@ function bookOffer(offerId) {
 
     if (result.success) {
         closeOfferModal();
+        var bookedOffer = findOfferInState(loadState(), offerId);
         
         // Show success animation overlay
         var overlay = document.getElementById("success-overlay");
         var content = document.getElementById("success-content");
+        content.innerHTML = renderBookingSuccess(bookedOffer);
         overlay.classList.remove("hidden");
         
         setTimeout(function() {
@@ -357,20 +433,76 @@ function bookOffer(offerId) {
         }, 10);
         
         setTimeout(function() {
-            content.style.opacity = "0";
-            content.style.transform = "scale(0.8)";
-            setTimeout(function() {
-                overlay.classList.add("hidden");
-                renderMapAndFeed(); 
-                if(!document.getElementById("view-explore").classList.contains("hidden")) {
-                    renderExploreFeed();
-                }
-            }, 400);
-        }, 2000);
+            renderMapAndFeed(); 
+            if(!document.getElementById("view-explore").classList.contains("hidden")) {
+                renderExploreFeed();
+            }
+        }, 400);
         
     } else {
         alert("Booking failed: " + result.error);
     }
+}
+
+function renderBookingSuccess(offer) {
+    var title = offer ? offer.title : "your experience";
+    var host = offer ? offer.hostName : "your host";
+    var eta = offer && offer.distance && offer.distance.indexOf("km") !== -1 ? "12 min" : "5 min";
+
+    return '' +
+        '<div class="success-check">✓</div>' +
+        '<h2 style="color:var(--text-primary); font-size:1.8rem; margin-bottom:8px;">Booking Confirmed!</h2>' +
+        '<p style="color:var(--text-secondary); font-size:1rem;">' + title + ' is in your Bookings tab.</p>' +
+        '<div class="directions-preview">Meet ' + host + ' in about ' + eta + '.</div>' +
+        '<div class="success-actions">' +
+            '<button class="btn btn-primary" onclick="hideSuccessOverlay(); openDummyFeature(\'Bookings\')">View booking</button>' +
+            '<button class="btn btn-outline" onclick="hideSuccessOverlay(); openDirectionsForOffer(\'' + (offer ? offer.id : "") + '\')">Directions</button>' +
+        '</div>';
+}
+
+function hideSuccessOverlay() {
+    var overlay = document.getElementById("success-overlay");
+    var content = document.getElementById("success-content");
+    content.style.opacity = "0";
+    content.style.transform = "scale(0.8)";
+    setTimeout(function() {
+        overlay.classList.add("hidden");
+    }, 300);
+}
+
+function openDirectionsForOffer(offerId) {
+    var state = loadState();
+    var offer = findOfferInState(state, offerId);
+    if (!offer) return;
+
+    var sheet = document.getElementById("dummy-feature-sheet");
+    var eta = offer.distance && offer.distance.indexOf("km") !== -1 ? "12 min walk" : "5 min walk";
+    sheet.innerHTML =
+        '<div class="sheet-handle"></div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<h2 style="font-size:1.5rem; color:var(--text-primary);">Directions</h2>' +
+            '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeDummyFeature()">✕</button>' +
+        '</div>' +
+        '<div class="directions-card">' +
+            '<div class="directions-map">' +
+                '<div class="route-dot start">You</div>' +
+                '<div class="route-line"></div>' +
+                '<div class="route-dot end">Host</div>' +
+            '</div>' +
+            '<div class="booking-title">' + offer.title + '</div>' +
+            '<div class="host-row booking-host">' +
+                '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
+                '<div class="host-copy">' +
+                    '<div class="host-name">' + offer.hostName + '</div>' +
+                    '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="directions-step">📍 Meet near central Bishkek landmark</div>' +
+            '<div class="directions-step">🚶 ' + eta + ' from your current area</div>' +
+            '<div class="directions-step">✅ Show this confirmation when you arrive</div>' +
+        '</div>';
+
+    document.getElementById("dummy-feature-modal").classList.remove("hidden");
 }
 
 function setupCategoryTabs() {
@@ -381,12 +513,54 @@ function setupCategoryTabs() {
             this.classList.add("active");
             
             window.currentCategoryFilter = this.innerText.trim();
+            window.currentNeedFilter = "";
+            clearNeedNowActive();
             renderMapAndFeed();
             if(!document.getElementById("view-explore").classList.contains("hidden")) {
                 renderExploreFeed();
             }
         };
     }
+}
+
+function setupNeedNowTabs() {
+    var chips = document.getElementsByClassName("need-chip");
+    for (var i = 0; i < chips.length; i++) {
+        chips[i].onclick = function() {
+            var selectedNeed = this.getAttribute("data-need");
+            var wasActive = this.classList.contains("active");
+            clearNeedNowActive();
+
+            if (wasActive) {
+                window.currentNeedFilter = "";
+            } else {
+                this.classList.add("active");
+                window.currentNeedFilter = selectedNeed;
+                resetCategoryFilterToAll();
+            }
+
+            renderMapAndFeed();
+            if(!document.getElementById("view-explore").classList.contains("hidden")) {
+                renderExploreFeed();
+            }
+        };
+    }
+}
+
+function clearNeedNowActive() {
+    var chips = document.getElementsByClassName("need-chip");
+    for (var i = 0; i < chips.length; i++) {
+        chips[i].classList.remove("active");
+    }
+}
+
+function resetCategoryFilterToAll() {
+    var pills = document.getElementsByClassName("cat-pill");
+    for (var i = 0; i < pills.length; i++) {
+        pills[i].classList.remove("active");
+        if (pills[i].innerText.trim() === "All") pills[i].classList.add("active");
+    }
+    window.currentCategoryFilter = "All";
 }
 
 // Request Modal Handlers
@@ -476,33 +650,25 @@ function openDummyFeature(featureName) {
     
     if (featureName === 'Bookings') {
         var currentState = loadState();
-        var myBookings = currentState.bookings; // Real state bookings
+        var myBookings = (currentState.bookings || []).slice(); // Real state bookings
+        myBookings.sort(function(a, b) {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
         
-        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
+        htmlContent += '<div class="bookings-list">';
         
         for (var b = 0; b < myBookings.length; b++) {
             var booking = myBookings[b];
-            var offerDetail = null;
-            for (var o = 0; o < currentState.offers.length; o++) {
-                if (currentState.offers[o].id === booking.offerId) {
-                    offerDetail = currentState.offers[o];
-                    break;
-                }
-            }
+            var offerDetail = findOfferInState(currentState, booking.offerId);
             if (offerDetail) {
-                htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);">';
-                htmlContent += '<div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">' + offerDetail.title + '</div>';
-                htmlContent += '<div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Booked on ' + new Date(booking.timestamp).toLocaleDateString() + '</div>';
-                htmlContent += '<div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">';
-                htmlContent += '<span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Confirmed</span>';
-                htmlContent += '<button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openReviewModal(\'' + offerDetail.id + '\')">Leave Review</button>';
-                htmlContent += '</div></div>';
+                htmlContent += renderBookingCard(booking, offerDetail);
             }
         }
         
-        // Static dummy past booking
-        htmlContent += '<div style="background:var(--bg-main); padding:1rem; border-radius:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Hiking in Ala Archa</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Past Experience</div><div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;"><span style="background:#e0e0e0; color:var(--text-secondary); padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:600;">Completed</span><button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openReviewModal(\'dummy_offer_1\')">Leave Review</button></div></div>';
-        
+        if (myBookings.length === 0) {
+            htmlContent += '<div class="empty-state">No bookings yet.<br><br>Book something nearby and it will appear here instantly.</div>';
+        }
+
         htmlContent += '</div>';
     } else if (featureName === 'Inbox') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';

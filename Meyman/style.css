@@ -189,6 +189,56 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 .categories-scroll::-webkit-scrollbar { display: none; }
 
+.need-now-bar {
+    display: flex;
+    gap: 0.55rem;
+    overflow-x: auto;
+    padding: 0 0.2rem 0.75rem;
+    scrollbar-width: none;
+}
+
+.need-now-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.need-now-bar::before {
+    content: "Need now";
+    flex: 0 0 auto;
+    align-self: center;
+    color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 900;
+    background: #fff3e0;
+    border: 1px solid rgba(255,152,0,0.22);
+    border-radius: var(--radius-round);
+    padding: 0.48rem 0.65rem;
+}
+
+.need-chip {
+    flex: 0 0 auto;
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-primary);
+    border-radius: var(--radius-round);
+    padding: 0.5rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.need-chip:active {
+    transform: scale(0.95);
+}
+
+.need-chip.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
 .cat-pill {
     white-space: nowrap;
     padding: 0.6rem 1.25rem;
@@ -582,6 +632,172 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 
 .happening-now .live-badge {
     top: 96px;
+}
+
+.bookings-list {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.booking-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    animation: cardFadeIn 0.18s ease both;
+}
+
+.booking-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.booking-main {
+    min-width: 0;
+}
+
+.booking-title {
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.booking-time {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+}
+
+.booking-host {
+    padding: 0.65rem;
+    border-radius: 16px;
+    background: var(--bg-main);
+}
+
+.booking-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.booking-review-btn {
+    width: auto;
+    padding: 0.5rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.live-status {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.success-check {
+    width: 80px;
+    height: 80px;
+    background: #4caf50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 3rem;
+    box-shadow: 0 8px 24px rgba(76,175,80,0.4);
+}
+
+.directions-preview {
+    margin: 1rem auto 0;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    background: #fff3e0;
+    color: #9a3412;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.success-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.success-actions .btn {
+    padding: 0.8rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.directions-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.directions-map {
+    position: relative;
+    height: 150px;
+    border-radius: 20px;
+    background:
+        linear-gradient(135deg, rgba(211,47,47,0.08), rgba(255,152,0,0.16)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.7) 0 12px, rgba(245,245,247,0.7) 12px 24px);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.route-line {
+    position: absolute;
+    left: 70px;
+    right: 74px;
+    top: 74px;
+    height: 4px;
+    border-radius: var(--radius-round);
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.route-dot {
+    position: absolute;
+    top: 52px;
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 0.72rem;
+    box-shadow: var(--shadow-md);
+}
+
+.route-dot.start {
+    left: 24px;
+    background: var(--text-primary);
+}
+
+.route-dot.end {
+    right: 24px;
+    background: var(--primary);
+}
+
+.directions-step {
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 750;
 }
 
 .bottom-nav {

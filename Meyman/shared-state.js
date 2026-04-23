@@ -131,6 +131,24 @@ function getInitialState() {
                 location: { x: 75, y: 48 },
                 createdAt: now,
                 urgency: "Starting in 15 min"
+            },
+            {
+                id: "offer_demo_8",
+                title: "Quick City Ride 🚗",
+                price: 600,
+                spots: 3,
+                category: "Transport",
+                hostName: "Azamat",
+                hostImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
+                rating: 4.8,
+                distance: "300m away",
+                badges: ["fast-responder", "top-rated"],
+                tags: ["🚗 City pickup", "🎒 Backpack friendly"],
+                isLive: true,
+                startTime: "Available now",
+                location: { x: 38, y: 72 },
+                createdAt: now,
+                urgency: "Available now"
             }
         ],
         bookings: [
@@ -276,6 +294,15 @@ function getHostDefaults(hostName, index) {
             badges: ["fast-responder", "warm-welcome"],
             tags: ["🚰 Water refill", "🔌 Phone charging"],
             isLive: false
+        },
+        Azamat: {
+            hostName: "Azamat",
+            hostImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
+            rating: 4.8,
+            distance: "300m away",
+            badges: ["fast-responder", "top-rated"],
+            tags: ["🚗 City pickup", "🎒 Backpack friendly"],
+            isLive: true
         }
     };
 

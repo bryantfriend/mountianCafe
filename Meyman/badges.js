@@ -232,6 +232,7 @@ function getHostTrustBadges(hostName) {
     if (hostName === "Bakyt") base = ["fast-responder", "top-rated"];
     if (hostName === "Gulzat") base = ["verified-host", "fast-responder"];
     if (hostName === "Mairam") base = ["fast-responder", "warm-welcome"];
+    if (hostName === "Azamat") base = ["fast-responder", "top-rated"];
     return base;
 }
 
