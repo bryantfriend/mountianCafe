@@ -31,8 +31,90 @@ function switchTab(tabId) {
     }
 }
 
+function getSortedOffers(offers) {
+    var sorted = offers.slice();
+    sorted.sort(function(a, b) {
+        if (!!a.isLive === !!b.isLive) {
+            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        }
+        return a.isLive ? -1 : 1;
+    });
+    return sorted;
+}
+
+function getOfferImage(offer, width) {
+    var size = width || 500;
+    if (offer.category === "Food") return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=" + size + "&q=80";
+    if (offer.category === "Stay") return "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=" + size + "&q=80";
+    if (offer.category === "Essentials") return "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=" + size + "&q=80";
+    if (offer.category === "Services") return "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=" + size + "&q=80";
+    return "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=" + size + "&q=80";
+}
+
+function getOfferBackground(offer, width) {
+    return "linear-gradient(135deg, rgba(211,47,47,0.18), rgba(255,152,0,0.16)), url('" + getOfferImage(offer, width) + "')";
+}
+
+function getAvailabilityText(offer) {
+    if (offer.isLive) return "Available now";
+    return offer.startTime || offer.urgency || "Starting soon";
+}
+
+function renderTags(tags) {
+    var safeTags = tags || [];
+    var html = "";
+    for (var i = 0; i < safeTags.length && i < 3; i++) {
+        html += '<span class="tag">' + safeTags[i] + '</span>';
+    }
+    return html;
+}
+
+function renderExperienceCard(offer, options) {
+    var opts = options || {};
+    var imgUrl = getOfferImage(offer, opts.imageWidth || 500);
+    var trustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
+    var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
+    var compactClass = opts.compact ? " compact-card" : "";
+
+    return '' +
+        '<div class="offer-card-img" style="background-image: ' + getOfferBackground(offer, opts.imageWidth || 500) + ';">' +
+            liveHtml +
+        '</div>' +
+        '<div class="offer-card-body' + compactClass + '">' +
+            '<div class="offer-title">' + offer.title + '</div>' +
+            '<div class="availability-line ' + (offer.isLive ? "is-live" : "") + '">' + getAvailabilityText(offer) + '</div>' +
+            '<div class="host-row">' +
+                '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
+                '<div class="host-copy">' +
+                    '<div class="host-name">' + offer.hostName + '</div>' +
+                    '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="badge-pill-row">' + trustPills + '</div>' +
+            '<div class="tag-row">' + renderTags(offer.tags) + '</div>' +
+            '<div class="offer-price-row">' +
+                '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
+            '</div>' +
+            (opts.hideButton ? '' : '<button class="btn btn-primary" onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>') +
+        '</div>';
+}
+
+function findOfferIndexById(offerId) {
+    var currentState = loadState();
+    for (var i = 0; i < currentState.offers.length; i++) {
+        if (currentState.offers[i].id === offerId) return i;
+    }
+    return -1;
+}
+
+function openOfferModalById(offerId) {
+    var index = findOfferIndexById(offerId);
+    if (index >= 0) openOfferModal(index);
+}
+
 function renderExploreFeed() {
     var currentState = loadState();
+    var sortedOffers = getSortedOffers(currentState.offers);
     
     // Render Categories
     var cats = ["food", "outdoors"];
@@ -41,17 +123,15 @@ function renderExploreFeed() {
         var container = document.getElementById("explore-cat-" + cats[c]);
         if (!container) continue;
         container.innerHTML = "";
-        for (var i=0; i<currentState.offers.length; i++) {
-            var offer = currentState.offers[i];
-            if (offer.category === catsFilter[c] || (c===1 && offer.category==="Transport")) {
+        for (var i=0; i<sortedOffers.length; i++) {
+            var offer = sortedOffers[i];
+            if (offer.category === catsFilter[c] || (c===1 && (offer.category==="Transport" || offer.category==="Essentials"))) {
                 var card = document.createElement("div");
-                card.className = "offer-card";
+                card.className = "offer-card" + (offer.isLive ? " live-card" : "");
                 card.style.minWidth = "220px";
                 card.style.width = "220px";
-                var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
-                var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
-                card.innerHTML = '<div class="offer-card-img" style="background-image:url(\''+imgUrl+'\'); height:120px;"></div><div class="offer-card-body" style="padding:0.8rem;"><div class="offer-title" style="font-size:1rem;">'+offer.title+'</div><div class="badge-pill-row">'+trustPills+'</div><div class="offer-price-row" style="margin-top:0.2rem;"><div class="offer-price" style="font-size:1rem;">'+offer.price+' KGS</div></div></div>';
-                card.onclick = (function(idx) { return function() { openOfferModal(idx); }; })(i);
+                card.innerHTML = renderExperienceCard(offer, { compact: true, hideButton: true, imageWidth: 400 });
+                card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
                 container.appendChild(card);
             }
         }
@@ -64,13 +144,13 @@ function renderExploreFeed() {
     
     var filter = window.currentCategoryFilter || "All";
     
-    for (var i = 0; i < currentState.offers.length; i++) {
-        var offer = currentState.offers[i];
+    for (var i = 0; i < sortedOffers.length; i++) {
+        var offer = sortedOffers[i];
         if (filter !== "All" && offer.category !== filter) continue;
 
         var card = document.createElement("div");
-        card.className = "explore-card";
-        var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=600&q=80";
+        card.className = "explore-card" + (offer.isLive ? " live-card" : "");
+        var imgUrl = getOfferImage(offer, 600);
         
         var bookedCount = 0;
         for (var j = 0; j < currentState.bookings.length; j++) {
@@ -79,20 +159,29 @@ function renderExploreFeed() {
         var availableSpots = offer.spots - bookedCount;
         var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
 
-        var verticalTrustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
+        var verticalTrustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
+        var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
         card.innerHTML = 
-            '<div class="explore-card-img" style="background-image: url(\'' + imgUrl + '\');"></div>' +
+            '<div class="explore-card-img" style="background-image: ' + getOfferBackground(offer, 600) + ';">' + liveHtml + '</div>' +
             '<div class="explore-card-overlay">' +
-                '<div class="explore-card-meta">📍 200m away • ⭐ 4.9 • 2 hours</div>' +
                 '<div class="explore-card-title">' + offer.title + '</div>' +
+                '<div class="availability-line overlay-availability ' + (offer.isLive ? "is-live" : "") + '">' + getAvailabilityText(offer) + '</div>' +
+                '<div class="host-row overlay-host">' +
+                    '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
+                    '<div class="host-copy">' +
+                        '<div class="host-name">' + offer.hostName + '</div>' +
+                        '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                    '</div>' +
+                '</div>' +
                 '<div class="badge-pill-row overlay-pills">' + verticalTrustPills + '</div>' +
+                '<div class="tag-row overlay-tags">' + renderTags(offer.tags) + '</div>' +
                 '<div class="explore-card-footer">' +
                     '<div class="explore-card-price">' + offer.price + ' <span>KGS</span></div>' +
                     '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); bookOffer(\''+offer.id+'\')">Book Now</button>' +
                 '</div>' +
             '</div>';
         
-        card.onclick = (function(idx) { return function() { openOfferModal(idx); }; })(i);
+        card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
         feedContainer.appendChild(card);
     }
 }
@@ -111,9 +200,10 @@ function renderMapAndFeed() {
     }
 
     var filter = window.currentCategoryFilter || "All";
+    var sortedOffers = getSortedOffers(currentState.offers);
 
-    for (var i = 0; i < currentState.offers.length; i++) {
-        var offer = currentState.offers[i];
+    for (var i = 0; i < sortedOffers.length; i++) {
+        var offer = sortedOffers[i];
         if (filter !== "All" && offer.category !== filter) continue;
 
         // Ensure spot count takes bookings into consideration for the customer view.
@@ -131,44 +221,24 @@ function renderMapAndFeed() {
         pin.style.top = offer.location.y + "%";
         
         // Pass index to avoid closure loop issues without arrow funcs
-        pin.setAttribute("data-index", i.toString());
+        pin.setAttribute("data-offer-id", offer.id);
         pin.onclick = function() {
-            var index = Number(this.getAttribute("data-index"));
-            openOfferModal(index);
+            openOfferModalById(this.getAttribute("data-offer-id"));
         };
         mapLayer.appendChild(pin);
 
         // Create Horizontal Feed Card
         var card = document.createElement("div");
-        card.className = "offer-card";
-        
-        // Use realistic image placeholders based on category
-        var imgUrl = "data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' fill='%23f1f5f9' xmlns='http://www.w3.org/2000/svg'><rect width='100' height='100'/></svg>";
-        if (offer.category === "Food") imgUrl = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80";
-        if (offer.category === "Stay") imgUrl = "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
+        card.className = "offer-card" + (offer.isLive ? " live-card" : "");
 
         var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
         var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
-        var urgencyTag = offer.urgency || "LIVE";
 
-        var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
-        card.innerHTML = 
-            '<div class="offer-card-img" style="background-image: url(\'' + imgUrl + '\');">' +
-                '<div class="live-badge">' + urgencyTag + '</div>' +
-            '</div>' +
-            '<div class="offer-card-body">' +
-                '<div class="offer-meta">📍 200m away • ⭐ 4.9 (32)</div>' +
-                '<div class="offer-title">' + offer.title + '</div>' +
-                '<div class="offer-host">' +
-                    '<div class="host-avatar">🧑</div>' + offer.hostName +
-                '</div>' +
-                '<div class="badge-pill-row">' + trustPills + '</div>' +
-                '<div class="offer-price-row">' +
-                    '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
-                    '<div class="spots-badge">' + spotsNotice + '</div>' +
-                '</div>' +
-                '<button class="btn btn-primary" ' + buttonDisabled + ' onclick="bookOffer(\'' + offer.id + '\')">Book Now</button>' +
-            '</div>';
+        card.innerHTML = renderExperienceCard(offer, { imageWidth: 500 }).replace(
+            '<button class="btn btn-primary" onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>',
+            '<div class="spots-badge">' + spotsNotice + '</div><button class="btn btn-primary" ' + buttonDisabled + ' onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>'
+        );
+        card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
             
         feedContainer.appendChild(card);
     }
@@ -185,20 +255,22 @@ function openOfferModal(index) {
     }
     var availableSpots = offer.spots - bookedCount;
 
-    var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
+    var imgUrl = getOfferImage(offer, 600);
 
     var sheet = document.getElementById("booking-sheet");
-    var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
+    var trustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
+    var liveHtml = offer.isLive ? '<div class="live-badge detail-live">LIVE NOW</div>' : "";
     sheet.innerHTML = 
         '<div class="sheet-handle" id="booking-sheet-handle"></div>' +
-        '<div style="width:100%; height:180px; border-radius:var(--radius-md); background:url(\''+imgUrl+'\') center/cover; margin-bottom:1rem;"></div>' +
+        '<div class="detail-image" style="background-image:' + getOfferBackground(offer, 600) + ';">' + liveHtml + '</div>' +
         '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-            '<div class="offer-host"><div class="host-avatar">🧑</div> <span style="font-weight:700; color:var(--text-primary); margin-left:8px;">' + offer.hostName + '</span></div>' +
+            '<div class="host-row"><img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '"><div class="host-copy"><div class="host-name">' + offer.hostName + '</div><div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div></div></div>' +
             '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeOfferModal()">✕</button>' +
         '</div>' +
-        '<div class="offer-meta" style="margin-top:0.5rem;">' + offer.category + ' • 📍 ~200m away</div>' +
         '<div class="badge-pill-row" style="margin-top:0.75rem;">' + trustPills + '</div>' +
+        '<div class="tag-row">' + renderTags(offer.tags) + '</div>' +
         '<h2 style="margin-top:0.5rem; font-size: 1.5rem; color:var(--text-primary);">' + offer.title + '</h2>' +
+        '<div class="availability-line ' + (offer.isLive ? "is-live" : "") + '">' + getAvailabilityText(offer) + '</div>' +
         '<div style="background:var(--bg-main); padding:1.25rem; border-radius:var(--radius-md); margin-top:1rem; border:1px solid var(--border-color);">' +
             '<div style="font-size:1.75rem; font-weight:800; color:var(--primary);">' + offer.price + ' <span style="font-size:1rem; font-weight:600; color:var(--text-secondary);">KGS / person</span></div>' +
             '<div style="color:var(--text-primary); font-weight:600; margin-top:6px; display:flex; align-items:center; gap:6px;">' + 

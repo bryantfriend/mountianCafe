@@ -7,6 +7,11 @@ function initSellerApp() {
 // Ensure no arrow functions as per ICF Rules
 function refreshDashboard() {
     var currentState = loadState();
+    var sortedOffers = currentState.offers.slice();
+    sortedOffers.sort(function(a, b) {
+        if (!!a.isLive === !!b.isLive) return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        return a.isLive ? -1 : 1;
+    });
     
     // Calculate Metrics
     var activeOffers = currentState.offers.length;
@@ -35,11 +40,11 @@ function refreshDashboard() {
     if (activeOffers === 0) {
         listContainer.innerHTML = '<div class="empty-state">You have no active offers.<br><br>Click the Create button to get started!</div>';
     } else {
-        for (var i = 0; i < currentState.offers.length; i++) {
-            var offer = currentState.offers[i];
+        for (var i = 0; i < sortedOffers.length; i++) {
+            var offer = sortedOffers[i];
             
             var el = document.createElement("div");
-            el.className = "offer-card";
+            el.className = "offer-card" + (offer.isLive ? " live-card" : "");
             
             // Count bookings for this offer
             var bookingsCount = 0;
@@ -47,14 +52,25 @@ function refreshDashboard() {
                 if (currentState.bookings[j].offerId === offer.id) bookingsCount++;
             }
 
-            var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
+            var trustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
+            var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
+            var availabilityText = offer.isLive ? "Available now" : (offer.startTime || offer.urgency || "Starting soon");
             var htmlString = 
                 '<div class="offer-card-img" style="background-image:url(\'https://images.unsplash.com/photo-1541843666579-166fb9c072eb?auto=format&fit=crop&w=400&q=80\');">' +
-                    '<div class="live-badge">LIVE</div>' +
+                    liveHtml +
                 '</div>' +
                 '<div class="offer-card-body">' +
                     '<div class="offer-title">' + offer.title + '</div>' +
+                    '<div class="availability-line ' + (offer.isLive ? "is-live" : "") + '">' + availabilityText + '</div>' +
+                    '<div class="host-row">' +
+                        '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
+                        '<div class="host-copy">' +
+                            '<div class="host-name">' + offer.hostName + '</div>' +
+                            '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                        '</div>' +
+                    '</div>' +
                     '<div class="badge-pill-row">' + trustPills + '</div>' +
+                    '<div class="tag-row"><span class="tag">' + (offer.tags && offer.tags[0] ? offer.tags[0] : "🤝 Warm welcome") + '</span><span class="tag">' + (offer.tags && offer.tags[1] ? offer.tags[1] : "☕ Local stories") + '</span></div>' +
                     '<div class="offer-price-row">' +
                         '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
                     '</div>' +
