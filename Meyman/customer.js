@@ -483,16 +483,30 @@ function closeDummyFeature() {
 // Boot application
 window.onload = function() {
     initCustomerApp();
-    
-    // Initialize 2GIS Map Background
-    if (typeof DG !== 'undefined') {
-        DG.then(function() {
-            DG.map('map-bg-layer', {
-                center: [42.8746, 74.5698], // Bishkek center
-                zoom: 13,
-                zoomControl: false,
-                fullscreenControl: false
-            });
-        });
-    }
+    initMapBackground();
 };
+
+function initMapBackground() {
+    var attempts = 0;
+
+    function tryInitMap() {
+        attempts += 1;
+        if (typeof DG !== 'undefined') {
+            DG.then(function() {
+                DG.map('map-bg-layer', {
+                    center: [42.8746, 74.5698], // Bishkek center
+                    zoom: 13,
+                    zoomControl: false,
+                    fullscreenControl: false
+                });
+            });
+            return;
+        }
+
+        if (attempts < 20) {
+            setTimeout(tryInitMap, 250);
+        }
+    }
+
+    tryInitMap();
+}
