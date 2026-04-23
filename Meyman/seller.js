@@ -47,12 +47,14 @@ function refreshDashboard() {
                 if (currentState.bookings[j].offerId === offer.id) bookingsCount++;
             }
 
+            var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
             var htmlString = 
                 '<div class="offer-card-img" style="background-image:url(\'https://images.unsplash.com/photo-1541843666579-166fb9c072eb?auto=format&fit=crop&w=400&q=80\');">' +
                     '<div class="live-badge">LIVE</div>' +
                 '</div>' +
                 '<div class="offer-card-body">' +
                     '<div class="offer-title">' + offer.title + '</div>' +
+                    '<div class="badge-pill-row">' + trustPills + '</div>' +
                     '<div class="offer-price-row">' +
                         '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
                     '</div>' +
@@ -223,8 +225,10 @@ function openDummyFeature(featureName) {
         htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:url(\'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200\') center/cover; margin-bottom:1rem;"></div>';
         htmlContent += '<h3 style="font-size:1.3rem;">Aigul</h3>';
         htmlContent += '<p style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">Superhost in Bishkek</p>';
+        htmlContent += '<button class="btn btn-primary" style="margin-top:1rem;" onclick="openHostConduct()">Start Verification</button>';
         htmlContent += '<button class="btn btn-outline" style="margin-top:1.5rem;">Edit Profile</button>';
         htmlContent += '</div>';
+        htmlContent += '<div data-profile-badges="host">' + renderBadgeGrid({ group: "host" }) + '</div>';
     }
 
     sheet.innerHTML = htmlContent;

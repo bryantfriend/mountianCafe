@@ -49,7 +49,8 @@ function renderExploreFeed() {
                 card.style.minWidth = "220px";
                 card.style.width = "220px";
                 var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
-                card.innerHTML = '<div class="offer-card-img" style="background-image:url(\''+imgUrl+'\'); height:120px;"></div><div class="offer-card-body" style="padding:0.8rem;"><div class="offer-title" style="font-size:1rem;">'+offer.title+'</div><div class="offer-price-row" style="margin-top:0.2rem;"><div class="offer-price" style="font-size:1rem;">'+offer.price+' KGS</div></div></div>';
+                var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
+                card.innerHTML = '<div class="offer-card-img" style="background-image:url(\''+imgUrl+'\'); height:120px;"></div><div class="offer-card-body" style="padding:0.8rem;"><div class="offer-title" style="font-size:1rem;">'+offer.title+'</div><div class="badge-pill-row">'+trustPills+'</div><div class="offer-price-row" style="margin-top:0.2rem;"><div class="offer-price" style="font-size:1rem;">'+offer.price+' KGS</div></div></div>';
                 card.onclick = (function(idx) { return function() { openOfferModal(idx); }; })(i);
                 container.appendChild(card);
             }
@@ -78,11 +79,13 @@ function renderExploreFeed() {
         var availableSpots = offer.spots - bookedCount;
         var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
 
+        var verticalTrustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
         card.innerHTML = 
             '<div class="explore-card-img" style="background-image: url(\'' + imgUrl + '\');"></div>' +
             '<div class="explore-card-overlay">' +
                 '<div class="explore-card-meta">📍 200m away • ⭐ 4.9 • 2 hours</div>' +
                 '<div class="explore-card-title">' + offer.title + '</div>' +
+                '<div class="badge-pill-row overlay-pills">' + verticalTrustPills + '</div>' +
                 '<div class="explore-card-footer">' +
                     '<div class="explore-card-price">' + offer.price + ' <span>KGS</span></div>' +
                     '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); bookOffer(\''+offer.id+'\')">Book Now</button>' +
@@ -148,6 +151,7 @@ function renderMapAndFeed() {
         var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
         var urgencyTag = offer.urgency || "LIVE";
 
+        var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
         card.innerHTML = 
             '<div class="offer-card-img" style="background-image: url(\'' + imgUrl + '\');">' +
                 '<div class="live-badge">' + urgencyTag + '</div>' +
@@ -158,6 +162,7 @@ function renderMapAndFeed() {
                 '<div class="offer-host">' +
                     '<div class="host-avatar">🧑</div>' + offer.hostName +
                 '</div>' +
+                '<div class="badge-pill-row">' + trustPills + '</div>' +
                 '<div class="offer-price-row">' +
                     '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
                     '<div class="spots-badge">' + spotsNotice + '</div>' +
@@ -183,6 +188,7 @@ function openOfferModal(index) {
     var imgUrl = offer.category === "Food" ? "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" : "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=400&q=80";
 
     var sheet = document.getElementById("booking-sheet");
+    var trustPills = renderBadgePills(getHostTrustBadges(offer.hostName));
     sheet.innerHTML = 
         '<div class="sheet-handle" id="booking-sheet-handle"></div>' +
         '<div style="width:100%; height:180px; border-radius:var(--radius-md); background:url(\''+imgUrl+'\') center/cover; margin-bottom:1rem;"></div>' +
@@ -191,6 +197,7 @@ function openOfferModal(index) {
             '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeOfferModal()">✕</button>' +
         '</div>' +
         '<div class="offer-meta" style="margin-top:0.5rem;">' + offer.category + ' • 📍 ~200m away</div>' +
+        '<div class="badge-pill-row" style="margin-top:0.75rem;">' + trustPills + '</div>' +
         '<h2 style="margin-top:0.5rem; font-size: 1.5rem; color:var(--text-primary);">' + offer.title + '</h2>' +
         '<div style="background:var(--bg-main); padding:1.25rem; border-radius:var(--radius-md); margin-top:1rem; border:1px solid var(--border-color);">' +
             '<div style="font-size:1.75rem; font-weight:800; color:var(--primary);">' + offer.price + ' <span style="font-size:1rem; font-weight:600; color:var(--text-secondary);">KGS / person</span></div>' +
@@ -455,7 +462,9 @@ function openDummyFeature(featureName) {
         htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:2.5rem;">😎</div>';
         htmlContent += '<div style="font-weight:700; font-size:1.2rem; color:var(--text-primary);">Hackathon Guest</div>';
         htmlContent += '<div style="font-size:0.9rem; color:var(--text-secondary);">Joined April 2026</div>';
+        htmlContent += '<button class="btn btn-primary" style="margin-top:1rem;" onclick="openCulturalGuide()">Open Cultural Guide</button>';
         htmlContent += '</div>';
+        htmlContent += '<div data-profile-badges="tourist">' + renderBadgeGrid({ group: "tourist" }) + '</div>';
         htmlContent += '<div style="margin-top:2rem; display:flex; flex-direction:column; gap:0.5rem;">';
         htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Payment Methods <span style="float:right;">&rarr;</span></button>';
         htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Language (EN) <span style="float:right;">&rarr;</span></button>';
