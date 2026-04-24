@@ -1,6 +1,6 @@
 // Meyman Shared State and Architecture (ICF Compliant)
 
-var STORAGE_KEY = "meyman_data_v2";
+var STORAGE_KEY = "meyman_data_v3";
 
 function getInitialState() {
     var now = new Date().toISOString();
@@ -116,7 +116,7 @@ function getInitialState() {
             },
             {
                 id: "offer_demo_7",
-                title: "Laundry, Water & Charging 🧺",
+                title: "Laundry Service 🧺",
                 price: 300,
                 spots: 6,
                 category: "Essentials",
@@ -125,7 +125,7 @@ function getInitialState() {
                 rating: 4.7,
                 distance: "500m away",
                 badges: ["fast-responder", "warm-welcome"],
-                tags: ["🚰 Water refill", "🔌 Phone charging"],
+                tags: ["🎒 Backpacker friendly", "🔌 Phone charging"],
                 isLive: false,
                 startTime: "Starting in 15 min",
                 location: { x: 75, y: 48 },
@@ -151,11 +151,7 @@ function getInitialState() {
                 urgency: "Available now"
             }
         ],
-        bookings: [
-            { bookingId: "booking_demo_1", offerId: "offer_demo_1", timestamp: new Date(Date.now() - 86400000).toISOString() },
-            { bookingId: "booking_demo_2", offerId: "offer_demo_1", timestamp: new Date(Date.now() - 40000000).toISOString() },
-            { bookingId: "booking_demo_3", offerId: "offer_demo_2", timestamp: new Date(Date.now() - 20000000).toISOString() }
-        ],
+        bookings: [],
         requests: [],
         reviews: [
             { id: "rev_demo_1", offerId: "offer_demo_1", rating: 5, comment: "Amazing plov! Aigul is a wonderful host.", customerName: "Guest_2041", timestamp: new Date(Date.now() - 86400000).toISOString() },
@@ -198,6 +194,13 @@ function normalizeLoadedState(state) {
         var existingDemo = findOfferById(state.offers, demos[d].id);
         if (!existingDemo) {
             state.offers.push(demos[d]);
+        } else {
+            existingDemo.spots = demos[d].spots;
+            existingDemo.price = demos[d].price;
+            existingDemo.title = demos[d].title;
+            existingDemo.category = demos[d].category;
+            existingDemo.location = demos[d].location;
+            existingDemo.urgency = demos[d].urgency;
         }
     }
 
@@ -474,8 +477,12 @@ function processAction(actionType, currentState, context) {
             }
         }
         
-        if (targetOffer && targetOffer.spots > 0) {
-            targetOffer.spots -= 1;
+        var bookingCount = 0;
+        for (var k = 0; k < newState.bookings.length; k++) {
+            if (newState.bookings[k].offerId === context.offerId) bookingCount++;
+        }
+
+        if (targetOffer && bookingCount < targetOffer.spots) {
             newState.bookings.push({
                 bookingId: context.bookingId,
                 offerId: context.offerId,

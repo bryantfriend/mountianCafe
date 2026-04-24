@@ -1,10 +1,13 @@
 // Customer App Logic (ICF Compliant)
 
 function initCustomerApp() {
+    window.currentCategoryFilter = "All";
+    window.currentNeedFilter = "";
     renderMapAndFeed();
     setupCategoryTabs();
     setupNeedNowTabs();
     setupBottomSheetDrag();
+    switchTab("explore");
 }
 
 function switchTab(tabId) {
@@ -64,10 +67,23 @@ function getAvailabilityText(offer) {
 function renderTags(tags) {
     var safeTags = tags || [];
     var html = "";
-    for (var i = 0; i < safeTags.length && i < 3; i++) {
+    for (var i = 0; i < safeTags.length && i < 2; i++) {
         html += '<span class="tag">' + safeTags[i] + '</span>';
     }
     return html;
+}
+
+function getBookingCountForOffer(state, offerId) {
+    var bookings = state.bookings || [];
+    var bookedCount = 0;
+    for (var i = 0; i < bookings.length; i++) {
+        if (bookings[i].offerId === offerId) bookedCount++;
+    }
+    return bookedCount;
+}
+
+function getAvailableSpots(state, offer) {
+    return offer.spots - getBookingCountForOffer(state, offer.id);
 }
 
 function renderExperienceCard(offer, options) {
@@ -216,22 +232,12 @@ function renderExploreFeed() {
     if(!feedContainer) return;
     feedContainer.innerHTML = "";
     
-    var filter = window.currentCategoryFilter || "All";
-    
     for (var i = 0; i < sortedOffers.length; i++) {
         var offer = sortedOffers[i];
         if (!offerVisibleForFilters(offer)) continue;
 
         var card = document.createElement("div");
         card.className = "explore-card" + (offer.isLive ? " live-card" : "");
-        var imgUrl = getOfferImage(offer, 600);
-        
-        var bookedCount = 0;
-        for (var j = 0; j < currentState.bookings.length; j++) {
-            if (currentState.bookings[j].offerId === offer.id) bookedCount++;
-        }
-        var availableSpots = offer.spots - bookedCount;
-        var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
 
         var verticalTrustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
         var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
@@ -273,19 +279,13 @@ function renderMapAndFeed() {
         return;
     }
 
-    var filter = window.currentCategoryFilter || "All";
     var sortedOffers = getSortedOffers(currentState.offers);
 
     for (var i = 0; i < sortedOffers.length; i++) {
         var offer = sortedOffers[i];
         if (!offerVisibleForFilters(offer)) continue;
 
-        // Ensure spot count takes bookings into consideration for the customer view.
-        var bookedCount = 0;
-        for (var j = 0; j < currentState.bookings.length; j++) {
-            if (currentState.bookings[j].offerId === offer.id) bookedCount++;
-        }
-        var availableSpots = offer.spots - bookedCount;
+        var availableSpots = getAvailableSpots(currentState, offer);
 
         // Create Map Pin
         var pin = document.createElement("div");
@@ -323,13 +323,7 @@ function openOfferModal(index) {
     var offer = currentState.offers[index];
     if (!offer) return;
 
-    var bookedCount = 0;
-    for (var j = 0; j < currentState.bookings.length; j++) {
-        if (currentState.bookings[j].offerId === offer.id) bookedCount++;
-    }
-    var availableSpots = offer.spots - bookedCount;
-
-    var imgUrl = getOfferImage(offer, 600);
+    var availableSpots = getAvailableSpots(currentState, offer);
 
     var sheet = document.getElementById("booking-sheet");
     var trustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
@@ -352,8 +346,7 @@ function openOfferModal(index) {
             '</div>' +
         '</div>' +
         '<div style="display:flex; gap:1rem; margin-top:1.5rem;">' +
-            '<button class="btn btn-outline" style="flex:1;">Chat</button>' +
-            '<button class="btn btn-primary" style="flex:2;" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="bookOffer(\'' + offer.id + '\')">Book Now</button>' +
+            '<button class="btn btn-primary" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="bookOffer(\'' + offer.id + '\')">Book Now</button>' +
         '</div>';
 
     document.getElementById("booking-modal").classList.remove("hidden");
@@ -451,7 +444,7 @@ function renderBookingSuccess(offer) {
 
     return '' +
         '<div class="success-check">✓</div>' +
-        '<h2 style="color:var(--text-primary); font-size:1.8rem; margin-bottom:8px;">Booking Confirmed!</h2>' +
+        '<h2 style="color:var(--text-primary); font-size:1.8rem; margin-bottom:8px;">Booked Successfully</h2>' +
         '<p style="color:var(--text-secondary); font-size:1rem;">' + title + ' is in your Bookings tab.</p>' +
         '<div class="directions-preview">Meet ' + host + ' in about ' + eta + '.</div>' +
         '<div class="success-actions">' +

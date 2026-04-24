@@ -25,8 +25,8 @@
 
             <!-- View Toggle -->
             <div class="toggle-container">
-                <button class="toggle-btn active" id="btn-tab-map" onclick="switchTab('map')">Map</button>
-                <button class="toggle-btn" id="btn-tab-explore" onclick="switchTab('explore')">Explore</button>
+                <button class="toggle-btn" id="btn-tab-map" onclick="switchTab('map')">Map</button>
+                <button class="toggle-btn active" id="btn-tab-explore" onclick="switchTab('explore')">Explore</button>
             </div>
 
             <div class="search-bar" style="margin-top:0.75rem;">
@@ -56,7 +56,7 @@
         </header>
 
         <!-- VIEW: MAP -->
-        <div id="view-map" class="view-tab active">
+        <div id="view-map" class="view-tab hidden">
             <!-- 2GIS Map Background -->
             <div class="map-wrapper" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: none;">
                 <div id="map-bg-layer" style="width: 100%; height: 100%;"></div>
@@ -77,7 +77,7 @@
         </div>
 
         <!-- VIEW: EXPLORE -->
-        <div id="view-explore" class="view-tab hidden">
+        <div id="view-explore" class="view-tab active">
             <div class="explore-content">
                 <div class="category-section">
                     <h3>🍽️ Eat Like a Local</h3>
