@@ -1,6 +1,6 @@
 // Meyman Shared State and Architecture (ICF Compliant)
 
-var STORAGE_KEY = "meyman_data_v3";
+var STORAGE_KEY = "meyman_data_v4";
 
 function getInitialState() {
     var now = new Date().toISOString();
@@ -8,106 +8,94 @@ function getInitialState() {
         offers: [
             {
                 id: "offer_demo_1",
-                title: "Cook Plov Dinner 🍽️",
-                price: 1500,
+                title: "Boorsok Making & Tasting 🍞",
+                price: 950,
                 spots: 5,
-                category: "Food",
-                hostName: "Aigul",
-                hostImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80",
+                category: "Eat Like a Local 🍽️",
+                hostName: "Aisuluu",
+                hostImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80",
                 rating: 4.9,
-                distance: "200m away",
+                priceLabel: "950 KGS / person",
+                distance: "220m away",
+                image: "https://source.unsplash.com/1200x900/?flatbread,tea,table",
                 badges: ["verified-host", "top-rated", "warm-welcome"],
-                tags: ["🍽️ Loves cooking", "☕ Tea & stories"],
+                tags: ["🍯 Fresh boorsok", "☕ Tea & stories"],
                 isLive: true,
                 startTime: "Available now",
                 location: { x: 30, y: 40 },
                 createdAt: now,
-                urgency: "Cooking now"
+                urgency: "Frying fresh now"
             },
             {
                 id: "offer_demo_2",
-                title: "Ala Archa Hike 🏔️",
-                price: 2500,
-                spots: 8,
-                category: "Events",
-                hostName: "Beksultan",
-                hostImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
+                title: "Beshbarmak & Meat Cooking 🔥",
+                price: 1400,
+                spots: 4,
+                category: "Eat Like a Local 🍽️",
+                hostName: "Nurgul",
+                hostImage: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=160&q=80",
                 rating: 4.8,
-                distance: "1.2km away",
-                badges: ["fast-responder", "popular-experience"],
-                tags: ["🏔️ Mountain guide", "🚗 Scenic stops"],
-                isLive: true,
-                startTime: "Leaving now",
-                location: { x: 70, y: 80 },
+                distance: "480m away",
+                image: "https://source.unsplash.com/1200x900/?meat,cooking,kitchen",
+                badges: ["verified-host", "popular-experience"],
+                tags: ["🥩 Family-style meal", "🔥 Traditional cooking"],
+                isLive: false,
+                startTime: "Starting in 20 min",
+                location: { x: 58, y: 44 },
                 createdAt: now,
-                urgency: "Leaving in 30 min"
+                urgency: "Dinner prep starts soon"
             },
             {
                 id: "offer_demo_3",
-                title: "Felt Making Workshop 🧶",
-                price: 1200,
-                spots: 4,
-                category: "Events",
-                hostName: "Nazira",
-                hostImage: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=160&q=80",
-                rating: 4.9,
-                distance: "450m away",
-                badges: ["verified-host", "warm-welcome"],
-                tags: ["🧶 Handmade crafts", "📖 Family traditions"],
-                isLive: false,
-                startTime: "Starting in 10 min",
-                location: { x: 50, y: 50 },
+                title: "Milking a Cow & Donkey Ride 🐄🐴",
+                price: 1300,
+                spots: 3,
+                category: "Nomad Life 🏔️",
+                hostName: "Ulan",
+                hostImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
+                rating: 4.8,
+                distance: "1.1km away",
+                image: "https://source.unsplash.com/1200x900/?rural,farm,horse",
+                badges: ["fast-responder", "warm-welcome"],
+                tags: ["🥛 Farm morning", "🏇 Nomad village"],
+                isLive: true,
+                startTime: "Leaving now",
+                location: { x: 70, y: 78 },
                 createdAt: now,
-                urgency: "Starting in 10 min"
+                urgency: "Leaving now"
             },
             {
                 id: "offer_demo_4",
-                title: "Bishkek City Walk 🚶",
-                price: 800,
-                spots: 10,
-                category: "Events",
-                hostName: "Timur",
-                hostImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80",
-                rating: 4.7,
-                distance: "600m away",
-                badges: ["fast-responder", "top-rated"],
-                tags: ["🚶 Hidden streets", "📸 Photo spots"],
+                title: "Felt & Embroidery Workshop 🧵🪡",
+                price: 1100,
+                spots: 6,
+                category: "Culture & Craft 🎨",
+                hostName: "Cholpon",
+                hostImage: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=160&q=80",
+                rating: 4.9,
+                distance: "390m away",
+                image: "https://source.unsplash.com/1200x900/?felt,embroidery,craft",
+                badges: ["verified-host", "warm-welcome"],
+                tags: ["🧶 Shyrdak basics", "🪡 Hand stitching"],
                 isLive: false,
-                startTime: "Starting in 25 min",
-                location: { x: 20, y: 30 },
+                startTime: "Starting in 15 min",
+                location: { x: 50, y: 52 },
                 createdAt: now,
-                urgency: "Gathering soon"
+                urgency: "Workshop starts soon"
             },
             {
                 id: "offer_demo_5",
-                title: "Osh Bazaar Run 🛒",
-                price: 900,
-                spots: 6,
-                category: "Services",
-                hostName: "Bakyt",
-                hostImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=160&q=80",
-                rating: 4.8,
-                distance: "350m away",
-                badges: ["fast-responder", "top-rated"],
-                tags: ["🛒 Knows vendors", "🍞 Fresh bread"],
-                isLive: true,
-                startTime: "Going now",
-                location: { x: 62, y: 34 },
-                createdAt: now,
-                urgency: "Going now"
-            },
-            {
-                id: "offer_demo_6",
                 title: "Shower Access 🚿",
                 price: 200,
                 spots: 4,
-                category: "Essentials",
+                category: "Essentials 🧼",
                 hostName: "Gulzat",
                 hostImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
                 rating: 4.8,
                 distance: "180m away",
+                image: "https://source.unsplash.com/1200x900/?bathroom,shower,clean",
                 badges: ["verified-host", "fast-responder"],
-                tags: ["🎒 Backpacker friendly", "⏱️ Quick stop"],
+                tags: ["🎒 Backpacker friendly", "🧼 Clean towels"],
                 isLive: true,
                 startTime: "Available now",
                 location: { x: 42, y: 62 },
@@ -115,48 +103,31 @@ function getInitialState() {
                 urgency: "Available now"
             },
             {
-                id: "offer_demo_7",
+                id: "offer_demo_6",
                 title: "Laundry Service 🧺",
                 price: 300,
-                spots: 6,
-                category: "Essentials",
+                spots: 5,
+                category: "Essentials 🧼",
                 hostName: "Mairam",
                 hostImage: "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=160&q=80",
                 rating: 4.7,
-                distance: "500m away",
+                distance: "520m away",
+                image: "https://source.unsplash.com/1200x900/?laundry,washing-machine,clothes",
                 badges: ["fast-responder", "warm-welcome"],
-                tags: ["🎒 Backpacker friendly", "🔌 Phone charging"],
+                tags: ["🧺 Wash & dry", "⏱️ Same-day pickup"],
                 isLive: false,
-                startTime: "Starting in 15 min",
-                location: { x: 75, y: 48 },
+                startTime: "Ready in 30 min",
+                location: { x: 76, y: 48 },
                 createdAt: now,
-                urgency: "Starting in 15 min"
-            },
-            {
-                id: "offer_demo_8",
-                title: "Quick City Ride 🚗",
-                price: 600,
-                spots: 3,
-                category: "Transport",
-                hostName: "Azamat",
-                hostImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
-                rating: 4.8,
-                distance: "300m away",
-                badges: ["fast-responder", "top-rated"],
-                tags: ["🚗 City pickup", "🎒 Backpack friendly"],
-                isLive: true,
-                startTime: "Available now",
-                location: { x: 38, y: 72 },
-                createdAt: now,
-                urgency: "Available now"
+                urgency: "Quick turnaround today"
             }
         ],
         bookings: [],
         requests: [],
         reviews: [
-            { id: "rev_demo_1", offerId: "offer_demo_1", rating: 5, comment: "Amazing plov! Aigul is a wonderful host.", customerName: "Guest_2041", timestamp: new Date(Date.now() - 86400000).toISOString() },
-            { id: "rev_demo_2", offerId: "offer_demo_1", rating: 5, comment: "Loved learning the history while cooking.", customerName: "Guest_5512", timestamp: new Date(Date.now() - 40000000).toISOString() },
-            { id: "rev_demo_3", offerId: "offer_demo_2", rating: 4, comment: "Beautiful mountains, but bring warm clothes!", customerName: "Guest_9912", timestamp: new Date(Date.now() - 20000000).toISOString() }
+            { id: "rev_demo_1", offerId: "offer_demo_1", rating: 5, comment: "Warm tea, fresh boorsok, and a very welcoming host.", customerName: "Guest_2041", timestamp: new Date(Date.now() - 86400000).toISOString() },
+            { id: "rev_demo_2", offerId: "offer_demo_4", rating: 5, comment: "Beautiful explanation of felt patterns and family traditions.", customerName: "Guest_5512", timestamp: new Date(Date.now() - 40000000).toISOString() },
+            { id: "rev_demo_3", offerId: "offer_demo_3", rating: 4, comment: "Super memorable and felt very local, not touristy.", customerName: "Guest_9912", timestamp: new Date(Date.now() - 20000000).toISOString() }
         ]
     };
 }
@@ -199,6 +170,15 @@ function normalizeLoadedState(state) {
             existingDemo.price = demos[d].price;
             existingDemo.title = demos[d].title;
             existingDemo.category = demos[d].category;
+            existingDemo.image = demos[d].image;
+            existingDemo.hostName = demos[d].hostName;
+            existingDemo.hostImage = demos[d].hostImage;
+            existingDemo.rating = demos[d].rating;
+            existingDemo.distance = demos[d].distance;
+            existingDemo.badges = demos[d].badges;
+            existingDemo.tags = demos[d].tags;
+            existingDemo.isLive = demos[d].isLive;
+            existingDemo.startTime = demos[d].startTime;
             existingDemo.location = demos[d].location;
             existingDemo.urgency = demos[d].urgency;
         }
@@ -218,6 +198,14 @@ function findOfferById(offers, offerId) {
     return null;
 }
 
+function getCategoryCoverImage(category) {
+    if (category === "Eat Like a Local 🍽️") return "https://source.unsplash.com/1200x900/?kyrgyz,food";
+    if (category === "Nomad Life 🏔️") return "https://source.unsplash.com/1200x900/?horse,rural,mountains";
+    if (category === "Culture & Craft 🎨") return "https://source.unsplash.com/1200x900/?felt,craft,textile";
+    if (category === "Essentials 🧼") return "https://source.unsplash.com/1200x900/?laundry,bathroom,clean";
+    return "https://source.unsplash.com/1200x900/?kyrgyzstan,travel";
+}
+
 function enrichOfferForDemo(offer, index) {
     var hostDefaults = getHostDefaults(offer.hostName, index);
 
@@ -227,6 +215,7 @@ function enrichOfferForDemo(offer, index) {
     if (!offer.distance) offer.distance = hostDefaults.distance;
     if (!offer.badges || !offer.badges.length) offer.badges = hostDefaults.badges;
     if (!offer.tags || !offer.tags.length) offer.tags = hostDefaults.tags;
+    if (!offer.image) offer.image = getCategoryCoverImage(offer.category);
     if (offer.isLive === undefined) offer.isLive = hostDefaults.isLive;
     if (!offer.startTime) offer.startTime = offer.isLive ? "Available now" : (offer.urgency || "Starting soon");
 
@@ -235,50 +224,41 @@ function enrichOfferForDemo(offer, index) {
 
 function getHostDefaults(hostName, index) {
     var defaults = {
-        Aigul: {
-            hostName: "Aigul",
-            hostImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80",
+        Aisuluu: {
+            hostName: "Aisuluu",
+            hostImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80",
             rating: 4.9,
-            distance: "200m away",
+            distance: "220m away",
             badges: ["verified-host", "top-rated", "warm-welcome"],
-            tags: ["🍽️ Loves cooking", "☕ Tea & stories"],
+            tags: ["🍞 Boorsok host", "☕ Tea & stories"],
             isLive: true
         },
-        Beksultan: {
-            hostName: "Beksultan",
+        Nurgul: {
+            hostName: "Nurgul",
+            hostImage: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=160&q=80",
+            rating: 4.8,
+            distance: "480m away",
+            badges: ["verified-host", "popular-experience"],
+            tags: ["🥩 Family recipes", "🔥 Slow cooking"],
+            isLive: false
+        },
+        Ulan: {
+            hostName: "Ulan",
             hostImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
             rating: 4.8,
-            distance: "1.2km away",
-            badges: ["fast-responder", "popular-experience"],
-            tags: ["🏔️ Mountain guide", "🚗 Scenic stops"],
+            distance: "1.1km away",
+            badges: ["fast-responder", "warm-welcome"],
+            tags: ["🐄 Farm morning", "🏔️ Nomad stories"],
             isLive: true
         },
-        Nazira: {
-            hostName: "Nazira",
+        Cholpon: {
+            hostName: "Cholpon",
             hostImage: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=160&q=80",
             rating: 4.9,
-            distance: "450m away",
+            distance: "390m away",
             badges: ["verified-host", "warm-welcome"],
-            tags: ["🧶 Handmade crafts", "📖 Family traditions"],
+            tags: ["🧵 Felt craft", "🪡 Embroidery"],
             isLive: false
-        },
-        Timur: {
-            hostName: "Timur",
-            hostImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80",
-            rating: 4.7,
-            distance: "600m away",
-            badges: ["fast-responder", "top-rated"],
-            tags: ["🚶 Hidden streets", "📸 Photo spots"],
-            isLive: false
-        },
-        Bakyt: {
-            hostName: "Bakyt",
-            hostImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=160&q=80",
-            rating: 4.8,
-            distance: "350m away",
-            badges: ["fast-responder", "top-rated"],
-            tags: ["🛒 Knows vendors", "🍞 Fresh bread"],
-            isLive: true
         },
         Gulzat: {
             hostName: "Gulzat",
@@ -293,27 +273,18 @@ function getHostDefaults(hostName, index) {
             hostName: "Mairam",
             hostImage: "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=160&q=80",
             rating: 4.7,
-            distance: "500m away",
+            distance: "520m away",
             badges: ["fast-responder", "warm-welcome"],
-            tags: ["🚰 Water refill", "🔌 Phone charging"],
+            tags: ["🧺 Wash & dry", "⏱️ Same-day pickup"],
             isLive: false
-        },
-        Azamat: {
-            hostName: "Azamat",
-            hostImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80",
-            rating: 4.8,
-            distance: "300m away",
-            badges: ["fast-responder", "top-rated"],
-            tags: ["🚗 City pickup", "🎒 Backpack friendly"],
-            isLive: true
         }
     };
 
     if (defaults[hostName]) return defaults[hostName];
 
     return {
-        hostName: hostName || "Aigul",
-        hostImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80",
+        hostName: hostName || "Aisuluu",
+        hostImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80",
         rating: 4.8,
         distance: (250 + (index * 80)) + "m away",
         badges: ["verified-host", "top-rated"],
@@ -411,14 +382,15 @@ function addContext(actionType, normalizedPayload) {
     
     if (actionType === "CREATE_OFFER") {
         context.offerId = "offer_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-        context.hostName = "Aigul"; // Concept Art Host Name
-        context.hostImage = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80";
+        context.hostName = "Aisuluu";
+        context.hostImage = "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80";
         context.rating = 4.9;
-        context.distance = "200m away";
+        context.distance = "220m away";
         context.badges = ["verified-host", "top-rated", "warm-welcome"];
-        context.tags = ["🍽️ Loves cooking", "☕ Tea & stories"];
+        context.tags = ["🤝 Local host", "☕ Warm welcome"];
         context.isLive = true;
         context.startTime = "Available now";
+        context.image = getCategoryCoverImage(context.category);
         context.location = {
             // Random location offset for UI map positioning
             x: Math.floor(Math.random() * 80) + 10,
@@ -459,6 +431,7 @@ function processAction(actionType, currentState, context) {
             hostImage: context.hostImage,
             rating: context.rating,
             distance: context.distance,
+            image: context.image,
             badges: context.badges,
             tags: context.tags,
             isLive: context.isLive,

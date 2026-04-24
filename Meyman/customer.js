@@ -47,12 +47,14 @@ function getSortedOffers(offers) {
 }
 
 function getOfferImage(offer, width) {
+    if (offer.image) return offer.image;
+
     var size = width || 500;
-    if (offer.category === "Food") return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=" + size + "&q=80";
-    if (offer.category === "Stay") return "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=" + size + "&q=80";
-    if (offer.category === "Essentials") return "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=" + size + "&q=80";
-    if (offer.category === "Services") return "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=" + size + "&q=80";
-    return "https://images.unsplash.com/photo-1542314831-c6a4d14d8373?w=" + size + "&q=80";
+    if (offer.category === "Eat Like a Local 🍽️") return "https://source.unsplash.com/" + size + "x" + size + "/?kyrgyz,food";
+    if (offer.category === "Nomad Life 🏔️") return "https://source.unsplash.com/" + size + "x" + size + "/?horse,rural,mountains";
+    if (offer.category === "Culture & Craft 🎨") return "https://source.unsplash.com/" + size + "x" + size + "/?felt,craft,textile";
+    if (offer.category === "Essentials 🧼") return "https://source.unsplash.com/" + size + "x" + size + "/?laundry,bathroom,clean";
+    return "https://source.unsplash.com/" + size + "x" + size + "/?kyrgyzstan,travel";
 }
 
 function getOfferBackground(offer, width) {
@@ -88,7 +90,6 @@ function getAvailableSpots(state, offer) {
 
 function renderExperienceCard(offer, options) {
     var opts = options || {};
-    var imgUrl = getOfferImage(offer, opts.imageWidth || 500);
     var trustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
     var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
     var compactClass = opts.compact ? " compact-card" : "";
@@ -144,11 +145,11 @@ function offerMatchesNeed(offer, need) {
         (offer.tags || []).join(" ")
     ].join(" ").toLowerCase();
 
-    if (need === "Food") return offer.category === "Food" || haystack.indexOf("food") !== -1 || haystack.indexOf("cook") !== -1;
-    if (need === "Shower") return offer.category === "Essentials" && haystack.indexOf("shower") !== -1;
-    if (need === "Laundry") return offer.category === "Essentials" && (haystack.indexOf("laundry") !== -1 || haystack.indexOf("water") !== -1);
-    if (need === "Charge") return offer.category === "Essentials" && (haystack.indexOf("charging") !== -1 || haystack.indexOf("charge") !== -1);
-    if (need === "Transport") return offer.category === "Transport" || haystack.indexOf("ride") !== -1 || haystack.indexOf("car") !== -1 || haystack.indexOf("transport") !== -1;
+    if (need === "Food") return offer.category === "Eat Like a Local 🍽️" || haystack.indexOf("food") !== -1 || haystack.indexOf("cook") !== -1 || haystack.indexOf("boorsok") !== -1 || haystack.indexOf("beshbarmak") !== -1;
+    if (need === "Nomad") return offer.category === "Nomad Life 🏔️" || haystack.indexOf("nomad") !== -1 || haystack.indexOf("cow") !== -1 || haystack.indexOf("donkey") !== -1;
+    if (need === "Culture") return offer.category === "Culture & Craft 🎨" || haystack.indexOf("felt") !== -1 || haystack.indexOf("embroidery") !== -1 || haystack.indexOf("craft") !== -1;
+    if (need === "Shower") return offer.category === "Essentials 🧼" && haystack.indexOf("shower") !== -1;
+    if (need === "Laundry") return offer.category === "Essentials 🧼" && haystack.indexOf("laundry") !== -1;
     return true;
 }
 
@@ -208,14 +209,14 @@ function renderExploreFeed() {
     
     // Render Categories
     var cats = ["food", "outdoors"];
-    var catsFilter = ["Food", "Events"]; 
+    var catsFilter = ["Eat Like a Local 🍽️", "Nomad Life 🏔️"];
     for (var c=0; c<cats.length; c++) {
         var container = document.getElementById("explore-cat-" + cats[c]);
         if (!container) continue;
         container.innerHTML = "";
         for (var i=0; i<sortedOffers.length; i++) {
             var offer = sortedOffers[i];
-            if (offer.category === catsFilter[c] || (c===1 && (offer.category==="Transport" || offer.category==="Essentials"))) {
+            if (offer.category === catsFilter[c] || (c === 1 && offer.category === "Culture & Craft 🎨")) {
                 var card = document.createElement("div");
                 card.className = "offer-card" + (offer.isLive ? " live-card" : "");
                 card.style.minWidth = "220px";
@@ -559,7 +560,7 @@ function resetCategoryFilterToAll() {
 // Request Modal Handlers
 function openRequestModal() {
     document.getElementById("request-description").value = "";
-    document.getElementById("request-category").value = "Food";
+    document.getElementById("request-category").value = "Eat Like a Local 🍽️";
     document.getElementById("request-modal").classList.remove("hidden");
 }
 
