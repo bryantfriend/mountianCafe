@@ -459,7 +459,8 @@ function processAction(actionType, currentState, context) {
             newState.bookings.push({
                 bookingId: context.bookingId,
                 offerId: context.offerId,
-                timestamp: context.timestamp
+                timestamp: context.timestamp,
+                paymentMethod: context.paymentMethod || "MBANK"
             });
         } else {
             throw new Error("Offer not found or no spots available.");

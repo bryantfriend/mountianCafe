@@ -739,6 +739,186 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     font-size: 0.9rem;
 }
 
+.payment-confirmed-line,
+.payment-mini {
+    font-size: 0.82rem;
+    color: #0f766e;
+    font-weight: 700;
+}
+
+.payment-confirmed-line {
+    margin: 0.6rem 0 0.2rem;
+}
+
+.payment-sheet {
+    background: #1f1f1f;
+    color: white;
+    padding-bottom: 2rem;
+}
+
+.payment-sheet .sheet-handle {
+    background: rgba(255,255,255,0.2);
+}
+
+.payment-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.payment-eyebrow {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.68);
+    margin-bottom: 0.3rem;
+}
+
+.payment-title {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.payment-close {
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: white;
+}
+
+.payment-summary-card {
+    background: #2b2b2b;
+    border-radius: 20px;
+    padding: 1rem 1.1rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.payment-summary-offer {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+}
+
+.payment-summary-host,
+.payment-total-label,
+.payment-detail,
+.payment-terms {
+    color: rgba(255,255,255,0.65);
+}
+
+.payment-summary-host {
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+}
+
+.payment-total-label {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.payment-total {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-top: 0.15rem;
+}
+
+.payment-total span {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.payment-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.payment-option {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #121212;
+    border-radius: 18px;
+    padding: 0.95rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: white;
+    text-align: left;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.payment-option:active {
+    transform: scale(0.97);
+}
+
+.payment-option.active {
+    border-color: rgba(255,152,0,0.8);
+    background: #171717;
+    box-shadow: 0 0 0 1px rgba(255,152,0,0.12);
+}
+
+.payment-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.payment-radio-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--secondary);
+}
+
+.payment-brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1rem;
+    flex: 0 0 auto;
+}
+
+.payment-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.payment-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+}
+
+.payment-detail {
+    font-size: 0.82rem;
+}
+
+.payment-submit {
+    margin-top: 1rem;
+}
+
+.payment-terms {
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    text-align: center;
+    line-height: 1.4;
+}
+
 .directions-card {
     display: flex;
     flex-direction: column;

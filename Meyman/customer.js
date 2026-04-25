@@ -3,6 +3,8 @@
 function initCustomerApp() {
     window.currentCategoryFilter = "All";
     window.currentNeedFilter = "";
+    window.selectedPaymentMethod = "mbank";
+    window.pendingPaymentOfferId = "";
     renderMapAndFeed();
     setupCategoryTabs();
     setupNeedNowTabs();
@@ -113,7 +115,7 @@ function renderExperienceCard(offer, options) {
             '<div class="offer-price-row">' +
                 '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
             '</div>' +
-            (opts.hideButton ? '' : '<button class="btn btn-primary" onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>') +
+            (opts.hideButton ? '' : '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>') +
         '</div>';
 }
 
@@ -176,6 +178,7 @@ function renderBookingCard(booking, offer) {
     var liveHtml = offer.isLive ? '<span class="status-pill live-status">LIVE</span>' : '<span class="status-pill confirmed">Confirmed</span>';
     var firstTag = offer.tags && offer.tags.length ? '<span class="tag">' + offer.tags[0] + '</span>' : "";
     var startText = offer.isLive ? "Available now" : (offer.startTime || "Starting soon");
+    var paymentLabel = booking.paymentMethod ? '<div class="payment-mini">Paid with ' + booking.paymentMethod + '</div>' : "";
 
     return '' +
         '<article class="booking-card">' +
@@ -196,6 +199,7 @@ function renderBookingCard(booking, offer) {
             '<div class="booking-footer">' +
                 '<div>' +
                     '<div class="availability-line ' + (offer.isLive ? "is-live" : "") + '">' + startText + '</div>' +
+                    paymentLabel +
                     '<div class="tag-row">' + firstTag + '</div>' +
                 '</div>' +
                 '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">Review</button>' +
@@ -258,7 +262,7 @@ function renderExploreFeed() {
                 '<div class="tag-row overlay-tags">' + renderTags(offer.tags) + '</div>' +
                 '<div class="explore-card-footer">' +
                     '<div class="explore-card-price">' + offer.price + ' <span>KGS</span></div>' +
-                    '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); bookOffer(\''+offer.id+'\')">Book Now</button>' +
+                    '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); openPaymentModal(\''+offer.id+'\')">Book Now</button>' +
                 '</div>' +
             '</div>';
         
@@ -310,8 +314,8 @@ function renderMapAndFeed() {
         var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
 
         card.innerHTML = renderExperienceCard(offer, { imageWidth: 500 }).replace(
-            '<button class="btn btn-primary" onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>',
-            '<div class="spots-badge">' + spotsNotice + '</div><button class="btn btn-primary" ' + buttonDisabled + ' onclick="event.stopPropagation(); bookOffer(\'' + offer.id + '\')">Book Now</button>'
+            '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>',
+            '<div class="spots-badge">' + spotsNotice + '</div><button class="btn btn-primary" ' + buttonDisabled + ' onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>'
         );
         card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
             
@@ -347,7 +351,7 @@ function openOfferModal(index) {
             '</div>' +
         '</div>' +
         '<div style="display:flex; gap:1rem; margin-top:1.5rem;">' +
-            '<button class="btn btn-primary" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="bookOffer(\'' + offer.id + '\')">Book Now</button>' +
+            '<button class="btn btn-primary" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="openPaymentModal(\'' + offer.id + '\')">Book Now</button>' +
         '</div>';
 
     document.getElementById("booking-modal").classList.remove("hidden");
@@ -403,22 +407,108 @@ function closeOfferModal() {
     }, 300); // match transition duration
 }
 
-function bookOffer(offerId) {
+var PAYMENT_METHODS = [
+    { id: "mbank", name: "MBANK", logo: "M", accent: "#f6c443", detail: "Fast local bank transfer" },
+    { id: "visa", name: "Visa / MasterCard", logo: "V", accent: "#2563eb", detail: "International cards accepted" },
+    { id: "o", name: "Moi O!", logo: "O!", accent: "#ff2d95", detail: "Mobile wallet" },
+    { id: "megapay", name: "MegaPay", logo: "M", accent: "#34c759", detail: "QR or app payment" },
+    { id: "optima", name: "Optima 24", logo: "O", accent: "#ef4444", detail: "Local banking app" },
+    { id: "bakai", name: "BakAi", logo: "B", accent: "#1d4ed8", detail: "Bank wallet" },
+    { id: "terminal", name: "Terminals", logo: "24", accent: "#f59e0b", detail: "Pay24, Quickpay, Onoi" }
+];
+
+function getPaymentMethodById(methodId) {
+    for (var i = 0; i < PAYMENT_METHODS.length; i++) {
+        if (PAYMENT_METHODS[i].id === methodId) return PAYMENT_METHODS[i];
+    }
+    return PAYMENT_METHODS[0];
+}
+
+function renderPaymentOptions(selectedMethodId) {
+    var html = "";
+    for (var i = 0; i < PAYMENT_METHODS.length; i++) {
+        var method = PAYMENT_METHODS[i];
+        var isSelected = method.id === selectedMethodId;
+        html += '' +
+            '<button class="payment-option' + (isSelected ? ' active' : '') + '" onclick="selectPaymentMethod(\'' + method.id + '\')">' +
+                '<span class="payment-radio">' + (isSelected ? '<span class="payment-radio-dot"></span>' : '') + '</span>' +
+                '<span class="payment-brand-mark" style="background:' + method.accent + ';">' + method.logo + '</span>' +
+                '<span class="payment-copy">' +
+                    '<span class="payment-name">' + method.name + '</span>' +
+                    '<span class="payment-detail">' + method.detail + '</span>' +
+                '</span>' +
+            '</button>';
+    }
+    return html;
+}
+
+function openPaymentModal(offerId) {
+    var state = loadState();
+    var offer = findOfferInState(state, offerId);
+    if (!offer) return;
+
+    window.pendingPaymentOfferId = offerId;
+    if (!window.selectedPaymentMethod) window.selectedPaymentMethod = "mbank";
+
+    var sheet = document.getElementById("payment-sheet");
+    sheet.innerHTML =
+        '<div class="sheet-handle"></div>' +
+        '<div class="payment-sheet-header">' +
+            '<div>' +
+                '<div class="payment-eyebrow">Payment methods</div>' +
+                '<h2 class="payment-title">Choose how to pay</h2>' +
+            '</div>' +
+            '<button class="btn-icon payment-close" onclick="closePaymentModal()">✕</button>' +
+        '</div>' +
+        '<div class="payment-summary-card">' +
+            '<div class="payment-summary-top">' +
+                '<div class="payment-summary-offer">' + offer.title + '</div>' +
+                '<div class="payment-summary-host">with ' + offer.hostName + '</div>' +
+            '</div>' +
+            '<div class="payment-total-label">Total</div>' +
+            '<div class="payment-total">' + offer.price + ' <span>KGS</span></div>' +
+        '</div>' +
+        '<div class="payment-options-list">' + renderPaymentOptions(window.selectedPaymentMethod) + '</div>' +
+        '<button class="btn btn-primary payment-submit" onclick="confirmPayment()">Pay Now</button>' +
+        '<p class="payment-terms">By tapping Pay Now, you confirm this demo booking and payment method.</p>';
+
+    document.getElementById("payment-modal").classList.remove("hidden");
+}
+
+function selectPaymentMethod(methodId) {
+    window.selectedPaymentMethod = methodId;
+    if (!window.pendingPaymentOfferId) return;
+    openPaymentModal(window.pendingPaymentOfferId);
+}
+
+function closePaymentModal() {
+    document.getElementById("payment-modal").classList.add("hidden");
+}
+
+function confirmPayment() {
+    if (!window.pendingPaymentOfferId) return;
+    var method = getPaymentMethodById(window.selectedPaymentMethod);
+    bookOffer(window.pendingPaymentOfferId, method.name);
+}
+
+function bookOffer(offerId, paymentMethodName) {
     // Utilize exactly the ICF 7-stage engine from shared-state.js
     var payload = {
-        offerId: offerId
+        offerId: offerId,
+        paymentMethod: paymentMethodName || getPaymentMethodById(window.selectedPaymentMethod).name
     };
 
     var result = executeAction("BOOK_OFFER", payload);
 
     if (result.success) {
+        closePaymentModal();
         closeOfferModal();
         var bookedOffer = findOfferInState(loadState(), offerId);
         
         // Show success animation overlay
         var overlay = document.getElementById("success-overlay");
         var content = document.getElementById("success-content");
-        content.innerHTML = renderBookingSuccess(bookedOffer);
+        content.innerHTML = renderBookingSuccess(bookedOffer, payload.paymentMethod);
         overlay.classList.remove("hidden");
         
         setTimeout(function() {
@@ -438,15 +528,17 @@ function bookOffer(offerId) {
     }
 }
 
-function renderBookingSuccess(offer) {
+function renderBookingSuccess(offer, paymentMethodName) {
     var title = offer ? offer.title : "your experience";
     var host = offer ? offer.hostName : "your host";
     var eta = offer && offer.distance && offer.distance.indexOf("km") !== -1 ? "12 min" : "5 min";
+    var paymentLine = paymentMethodName ? '<div class="payment-confirmed-line">Paid with ' + paymentMethodName + '</div>' : "";
 
     return '' +
         '<div class="success-check">✓</div>' +
         '<h2 style="color:var(--text-primary); font-size:1.8rem; margin-bottom:8px;">Booked Successfully</h2>' +
         '<p style="color:var(--text-secondary); font-size:1rem;">' + title + ' is in your Bookings tab.</p>' +
+        paymentLine +
         '<div class="directions-preview">Meet ' + host + ' in about ' + eta + '.</div>' +
         '<div class="success-actions">' +
             '<button class="btn btn-primary" onclick="hideSuccessOverlay(); openDummyFeature(\'Bookings\')">View booking</button>' +
