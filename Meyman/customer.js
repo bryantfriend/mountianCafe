@@ -862,7 +862,7 @@ function openDummyFeature(featureName) {
                 }
             }
         } else {
-            htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Meyman Support</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Welcome to Meyman! Explore our local experiences.</div></div></div>';
+            htmlContent += '<div style="display:flex; gap:12px; align-items:center;"><div style="width:48px; height:48px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🧑</div><div style="flex:1;"><div style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Meiman Support</div><div style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Welcome to Meiman! Explore our local experiences.</div></div></div>';
         }
         
         htmlContent += '</div>';

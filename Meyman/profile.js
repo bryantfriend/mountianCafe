@@ -1,4 +1,4 @@
-// Meyman Profile Badge Display
+// Meiman Profile Badge Display
 
 function renderBadgeGrid(options) {
     var opts = options || {};

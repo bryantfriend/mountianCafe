@@ -1,4 +1,4 @@
-var LANGUAGE_STORAGE_KEY = "meyman_language_v1";
+var LANGUAGE_STORAGE_KEY = "meiman_language_v1";
 
 var LANGUAGES = {
     en: { label: "English", flag: "🇺🇸", short: "EN" },
@@ -9,7 +9,7 @@ var LANGUAGES = {
 var TRANSLATIONS = {
     en: {
         choose_language: "Choose your language",
-        choose_language_subtitle: "Pick the language for the Meyman interface.",
+        choose_language_subtitle: "Pick the language for the Meiman interface.",
         map: "Map",
         explore: "Explore",
         cultural_guide: "Cultural Guide",
@@ -70,7 +70,7 @@ var TRANSLATIONS = {
         pay_now: "Pay Now",
         pay_terms: "By tapping Pay Now, you confirm this demo booking and payment method.",
         no_bookings_yet: "No bookings yet.\n\nBook something nearby and it will appear here instantly.",
-        support_welcome: "Welcome to Meyman! Explore our local experiences.",
+        support_welcome: "Welcome to Meiman! Explore our local experiences.",
         thanks_for_booking: "Thanks for booking {title}! See you soon.",
         traveler_profile_name: "Traveler",
         joined_april_2026: "Joined April 2026",
@@ -173,7 +173,7 @@ var TRANSLATIONS = {
     },
     ru: {
         choose_language: "Выберите язык",
-        choose_language_subtitle: "Выберите язык интерфейса Meyman.",
+        choose_language_subtitle: "Выберите язык интерфейса Meiman.",
         map: "Карта",
         explore: "Лента",
         cultural_guide: "Культурный гид",
@@ -234,7 +234,7 @@ var TRANSLATIONS = {
         pay_now: "Оплатить",
         pay_terms: "Нажимая «Оплатить», вы подтверждаете демо-бронирование и способ оплаты.",
         no_bookings_yet: "Пока нет бронирований.\n\nЗабронируйте что-нибудь рядом, и оно сразу появится здесь.",
-        support_welcome: "Добро пожаловать в Meyman! Открывайте местные впечатления.",
+        support_welcome: "Добро пожаловать в Meiman! Открывайте местные впечатления.",
         thanks_for_booking: "Спасибо за бронирование {title}! До встречи.",
         traveler_profile_name: "Путешественник",
         joined_april_2026: "С нами с апреля 2026",
@@ -337,7 +337,7 @@ var TRANSLATIONS = {
     },
     ky: {
         choose_language: "Тилди тандаңыз",
-        choose_language_subtitle: "Meyman интерфейсинин тилин тандаңыз.",
+        choose_language_subtitle: "Meiman интерфейсинин тилин тандаңыз.",
         map: "Карта",
         explore: "Тасма",
         cultural_guide: "Маданий гид",
@@ -398,7 +398,7 @@ var TRANSLATIONS = {
         pay_now: "Төлөө",
         pay_terms: "«Төлөө» баскычы аркылуу демо-ээлөөнү жана төлөм ыкмасын тастыктайсыз.",
         no_bookings_yet: "Азырынча ээлөөлөр жок.\n\nЖакын жерден бир нерсени ээлесеңиз, ал бул жерде дароо көрүнөт.",
-        support_welcome: "Meyman'га кош келиңиз! Жергиликтүү тажрыйбаларды ачыңыз.",
+        support_welcome: "Meiman'га кош келиңиз! Жергиликтүү тажрыйбаларды ачыңыз.",
         thanks_for_booking: "{title} ээлегениңиз үчүн рахмат! Жакында көрүшөбүз.",
         traveler_profile_name: "Саякатчы",
         joined_april_2026: "2026-жылдын апрелинен бери",

@@ -1,4 +1,4 @@
-// Meyman Interactive Onboarding
+// Meiman Interactive Onboarding
 
 var HOST_CONDUCT_STEPS = [
     {

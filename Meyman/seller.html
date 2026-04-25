@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Host Dashboard - Meyman</title>
+    <title>Host Dashboard - Meiman</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="seller-app">
@@ -12,10 +12,13 @@
         <!-- Top Header -->
         <header class="seller-header">
             <div style="font-size:1.5rem; color:var(--text-primary); font-weight:bold; cursor:pointer;" onclick="openDummyFeature('Menu')">☰</div>
-            <img src="logo.png" alt="Meyman Logo" style="height:40px; object-fit:contain;">
-            <div class="bell-icon" style="cursor:pointer;" onclick="openDummyFeature('Notifications')">
-                🔔
-                <div class="badge-red">2</div>
+            <img src="logo.png" alt="Meiman Logo" style="height:40px; object-fit:contain;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button class="language-globe-btn" id="seller-top-language-btn" onclick="openLanguageSelector(false)" aria-label="Change language" title="Change language">🌐</button>
+                <div class="bell-icon" style="cursor:pointer;" onclick="openDummyFeature('Notifications')">
+                    🔔
+                    <div class="badge-red">2</div>
+                </div>
             </div>
         </header>
 

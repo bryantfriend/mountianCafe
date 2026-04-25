@@ -1,6 +1,6 @@
-// Meyman Shared State and Architecture (ICF Compliant)
+// Meiman Shared State and Architecture (ICF Compliant)
 
-var STORAGE_KEY = "meyman_data_v4";
+var STORAGE_KEY = "meiman_data_v4";
 
 function getInitialState() {
     var now = new Date().toISOString();

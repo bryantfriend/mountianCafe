@@ -1,6 +1,6 @@
-// Meyman Badge System
+// Meiman Badge System
 
-var BADGE_STORAGE_KEY = "meyman_badges_v1";
+var BADGE_STORAGE_KEY = "meiman_badges_v1";
 
 var BADGE_DEFINITIONS = [
     {
