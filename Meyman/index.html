@@ -16,10 +16,10 @@
                     <img src="logo.png" alt="Meyman Logo" style="height:48px; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <button class="guide-chip" onclick="openCulturalGuide()">Cultural Guide</button>
-                    <a href="seller.html" style="font-size:0.75rem; font-weight:800; color:var(--primary); text-decoration:none; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm); border:1px solid var(--primary);">Host Mode</a>
+                    <button class="guide-chip" id="guide-chip" onclick="openCulturalGuide()">Cultural Guide</button>
+                    <a href="seller.html" id="host-mode-link" style="font-size:0.75rem; font-weight:800; color:var(--primary); text-decoration:none; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm); border:1px solid var(--primary);">Host Mode</a>
                     <div style="font-size:0.85rem; font-weight:600; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">📍 Bishkek</div>
-                    <div style="font-size:0.85rem; font-weight:800; background:var(--primary); color:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">v1.9</div>
+                    <div style="font-size:0.85rem; font-weight:800; background:var(--primary); color:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">v2.0</div>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
 
             <div class="search-bar" style="margin-top:0.75rem;">
                 <span>🔍</span>
-                <input type="text" placeholder="Search experiences, food, places...">
+                <input type="text" id="search-input" placeholder="Search experiences, food, places...">
             </div>
 
             <div class="need-now-bar" id="need-now-tabs">
@@ -43,14 +43,14 @@
             </div>
 
             <div class="categories-scroll" id="category-tabs">
-                <div class="cat-pill active">All</div>
-                <div class="cat-pill">Eat Like a Local 🍽️</div>
-                <div class="cat-pill">Nomad Life 🏔️</div>
-                <div class="cat-pill">Culture & Craft 🎨</div>
-                <div class="cat-pill">Essentials 🧼</div>
+                <div class="cat-pill active" data-category="All">All</div>
+                <div class="cat-pill" data-category="Eat Like a Local 🍽️">Eat Like a Local 🍽️</div>
+                <div class="cat-pill" data-category="Nomad Life 🏔️">Nomad Life 🏔️</div>
+                <div class="cat-pill" data-category="Culture & Craft 🎨">Culture & Craft 🎨</div>
+                <div class="cat-pill" data-category="Essentials 🧼">Essentials 🧼</div>
             </div>
             
-            <p class="motto">Your lifestyle is their experience</p>
+            <p class="motto" id="app-motto">Your lifestyle is their experience</p>
         </header>
 
         <!-- VIEW: MAP -->
@@ -67,7 +67,7 @@
 
             <!-- Floating Happening Now Cards -->
             <section class="happening-now">
-                <h3 class="section-title">Happening Now 🔥</h3>
+                <h3 class="section-title" id="happening-title">Happening Now 🔥</h3>
                 <div class="horizontal-feed" id="happening-feed">
                     <!-- Offer Cards injected here by JS -->
                 </div>
@@ -78,15 +78,15 @@
         <div id="view-explore" class="view-tab active">
             <div class="explore-content">
                 <div class="category-section">
-                    <h3>🍽️ Eat Like a Local</h3>
+                    <h3 id="explore-food-title">🍽️ Eat Like a Local</h3>
                     <div class="horizontal-feed" id="explore-cat-food"></div>
                 </div>
                 <div class="category-section">
-                    <h3>🏔️ Nomad Life & Craft</h3>
+                    <h3 id="explore-outdoors-title">🏔️ Nomad Life & Craft</h3>
                     <div class="horizontal-feed" id="explore-cat-outdoors"></div>
                 </div>
                 
-                <h3 class="feed-title" style="padding:0 1.25rem 0.5rem; font-weight:800; font-size:1.4rem;">Discover</h3>
+                <h3 class="feed-title" id="discover-title" style="padding:0 1.25rem 0.5rem; font-weight:800; font-size:1.4rem;">Discover</h3>
                 <div id="explore-vertical-feed" class="vertical-feed">
                     <!-- Immersive vertical cards injected here -->
                 </div>
@@ -105,13 +105,13 @@
             <div class="bottom-sheet">
                 <div class="sheet-handle"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2 style="font-size:1.5rem; color:var(--text-primary);">Request an Experience</h2>
+                    <h2 id="request-modal-title" style="font-size:1.5rem; color:var(--text-primary);">Request an Experience</h2>
                     <button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeRequestModal()">✕</button>
                 </div>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1rem;">Can't find what you're looking for? Ask locals directly.</p>
+                <p id="request-modal-desc" style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1rem;">Can't find what you're looking for? Ask locals directly.</p>
                 
                 <div class="form-group" style="margin-bottom:1rem;">
-                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Category</label>
+                    <label id="request-category-label" style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Category</label>
                     <select id="request-category" style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; outline:none;">
                         <option value="Eat Like a Local 🍽️">Eat Like a Local 🍽️</option>
                         <option value="Nomad Life 🏔️">Nomad Life 🏔️</option>
@@ -121,11 +121,11 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:1.5rem;">
-                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">What are you looking for?</label>
+                    <label id="request-description-label" style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">What are you looking for?</label>
                     <textarea id="request-description" rows="3" placeholder="Example: I'd love to learn how to cook traditional plov..." style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; resize:none; outline:none; font-family:inherit;"></textarea>
                 </div>
 
-                <button class="btn btn-primary" style="width:100%; padding:1rem;" onclick="submitRequest()">Submit Request</button>
+                <button class="btn btn-primary" id="request-submit-btn" style="width:100%; padding:1rem;" onclick="submitRequest()">Submit Request</button>
             </div>
         </div>
 
@@ -141,15 +141,15 @@
             <div class="bottom-sheet">
                 <div class="sheet-handle"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2 style="font-size:1.5rem; color:var(--text-primary);">Leave a Review</h2>
+                    <h2 id="review-modal-title" style="font-size:1.5rem; color:var(--text-primary);">Leave a Review</h2>
                     <button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeReviewModal()">✕</button>
                 </div>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1rem;">How was your experience? Your feedback helps the community!</p>
+                <p id="review-modal-desc" style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1rem;">How was your experience? Your feedback helps the community!</p>
                 
                 <input type="hidden" id="review-offer-id">
                 
                 <div class="form-group" style="margin-bottom:1rem;">
-                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Rating (1-5)</label>
+                    <label id="review-rating-label" style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Rating (1-5)</label>
                     <select id="review-rating" style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; outline:none;">
                         <option value="5">⭐⭐⭐⭐⭐ (5) Excellent</option>
                         <option value="4">⭐⭐⭐⭐ (4) Very Good</option>
@@ -160,11 +160,11 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:1.5rem;">
-                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Your Comment</label>
+                    <label id="review-comment-label" style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:4px; color:var(--text-primary);">Your Comment</label>
                     <textarea id="review-comment" rows="3" placeholder="Tell us what you liked or how the host can improve..." style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-main); color:var(--text-primary); font-size:1rem; resize:none; outline:none; font-family:inherit;"></textarea>
                 </div>
 
-                <button class="btn btn-primary" style="width:100%; padding:1rem;" onclick="submitReview()">Submit Review</button>
+                <button class="btn btn-primary" id="review-submit-btn" style="width:100%; padding:1rem;" onclick="submitReview()">Submit Review</button>
             </div>
         </div>
 
@@ -179,23 +179,23 @@
         <nav class="bottom-nav">
             <a href="#" class="nav-item active">
                 <span class="nav-icon">🗺️</span>
-                <span>Map</span>
+                <span id="nav-map-label">Map</span>
             </a>
             <a href="#" class="nav-item" onclick="openRequestModal()">
                 <span class="nav-icon" style="color:var(--primary);">➕</span>
-                <span>New</span>
+                <span id="nav-new-label">New</span>
             </a>
             <a href="#" class="nav-item" onclick="openDummyFeature('Bookings')">
                 <span class="nav-icon">📅</span>
-                <span>Bookings</span>
+                <span id="nav-bookings-label">Bookings</span>
             </a>
             <a href="#" class="nav-item" onclick="openDummyFeature('Inbox')">
                 <span class="nav-icon">💬</span>
-                <span>Inbox</span>
+                <span id="nav-inbox-label">Inbox</span>
             </a>
             <a href="#" class="nav-item" onclick="openDummyFeature('Profile')">
                 <span class="nav-icon">👤</span>
-                <span>Profile</span>
+                <span id="nav-profile-label">Profile</span>
             </a>
         </nav>
         <!-- Instant Booking Success Overlay -->
@@ -208,6 +208,7 @@
 
     <!-- Core State Framework -->
     <script src="shared-state.js"></script>
+    <script src="language.js"></script>
     <script src="badges.js"></script>
     <script src="profile.js"></script>
     <script src="onboarding.js"></script>

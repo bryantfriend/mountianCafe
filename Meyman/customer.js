@@ -5,11 +5,96 @@ function initCustomerApp() {
     window.currentNeedFilter = "";
     window.selectedPaymentMethod = "mbank";
     window.pendingPaymentOfferId = "";
+    window.applyAppTranslations = function() {
+        applyCustomerTranslations();
+        renderMapAndFeed();
+        renderExploreFeed();
+    };
+    initializeLanguageSystem();
+    applyCustomerTranslations();
     renderMapAndFeed();
     setupCategoryTabs();
     setupNeedNowTabs();
     setupBottomSheetDrag();
     switchTab("explore");
+}
+
+function getNeedLabel(need) {
+    if (need === "Food") return t("hungry");
+    if (need === "Nomad") return t("nomad_life");
+    if (need === "Culture") return t("craft");
+    if (need === "Shower") return t("shower");
+    if (need === "Laundry") return t("laundry");
+    return need;
+}
+
+function applyCustomerTranslations() {
+    var guide = document.getElementById("guide-chip");
+    if (guide) guide.textContent = t("cultural_guide");
+
+    var hostLink = document.getElementById("host-mode-link");
+    if (hostLink) hostLink.textContent = t("host_mode");
+
+    var mapBtn = document.getElementById("btn-tab-map");
+    var exploreBtn = document.getElementById("btn-tab-explore");
+    if (mapBtn) mapBtn.textContent = t("map");
+    if (exploreBtn) exploreBtn.textContent = t("explore");
+
+    var searchInput = document.getElementById("search-input");
+    if (searchInput) searchInput.placeholder = t("search_placeholder");
+
+    var needChips = document.getElementsByClassName("need-chip");
+    for (var i = 0; i < needChips.length; i++) {
+        needChips[i].textContent = getNeedLabel(needChips[i].getAttribute("data-need"));
+    }
+
+    var catPills = document.getElementsByClassName("cat-pill");
+    for (var j = 0; j < catPills.length; j++) {
+        catPills[j].textContent = getCategoryLabel(catPills[j].getAttribute("data-category"));
+    }
+
+    var ids = {
+        "app-motto": "motto",
+        "happening-title": "happening_now",
+        "explore-food-title": "eat_like_local_short",
+        "explore-outdoors-title": "nomad_craft_short",
+        "discover-title": "discover",
+        "request-modal-title": "request_experience",
+        "request-modal-desc": "request_desc",
+        "request-category-label": "category",
+        "request-description-label": "request_what",
+        "request-submit-btn": "submit_request",
+        "review-modal-title": "leave_review",
+        "review-modal-desc": "review_desc",
+        "review-rating-label": "rating_label",
+        "review-comment-label": "your_comment",
+        "review-submit-btn": "submit_review",
+        "nav-map-label": "map",
+        "nav-new-label": "new",
+        "nav-bookings-label": "bookings",
+        "nav-inbox-label": "inbox",
+        "nav-profile-label": "profile"
+    };
+
+    for (var id in ids) {
+        if (Object.prototype.hasOwnProperty.call(ids, id)) {
+            var element = document.getElementById(id);
+            if (element) element.textContent = t(ids[id]);
+        }
+    }
+
+    var requestDescription = document.getElementById("request-description");
+    if (requestDescription) requestDescription.placeholder = t("request_placeholder");
+
+    var reviewComment = document.getElementById("review-comment");
+    if (reviewComment) reviewComment.placeholder = t("review_placeholder");
+
+    var requestCategory = document.getElementById("request-category");
+    if (requestCategory) {
+        for (var r = 0; r < requestCategory.options.length; r++) {
+            requestCategory.options[r].text = getCategoryLabel(requestCategory.options[r].value);
+        }
+    }
 }
 
 function switchTab(tabId) {
@@ -64,8 +149,8 @@ function getOfferBackground(offer, width) {
 }
 
 function getAvailabilityText(offer) {
-    if (offer.isLive) return "Available now";
-    return offer.startTime || offer.urgency || "Starting soon";
+    if (offer.isLive) return t("available_now");
+    return offer.startTime || offer.urgency || t("starting_soon");
 }
 
 function renderTags(tags) {
@@ -115,7 +200,7 @@ function renderExperienceCard(offer, options) {
             '<div class="offer-price-row">' +
                 '<div class="offer-price">' + offer.price + ' <span>KGS / person</span></div>' +
             '</div>' +
-            (opts.hideButton ? '' : '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>') +
+            (opts.hideButton ? '' : '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">' + t("book_now") + '</button>') +
         '</div>';
 }
 
@@ -169,16 +254,16 @@ function getBookingTimeLabel(booking) {
     var date = new Date(booking.timestamp);
     var today = new Date();
     if (date.toDateString() === today.toDateString()) {
-        return "Booked today, " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        return t("booked_today", { time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) });
     }
-    return "Booked " + date.toLocaleDateString([], { month: "short", day: "numeric" });
+    return t("booked_on", { date: date.toLocaleDateString([], { month: "short", day: "numeric" }) });
 }
 
 function renderBookingCard(booking, offer) {
-    var liveHtml = offer.isLive ? '<span class="status-pill live-status">LIVE</span>' : '<span class="status-pill confirmed">Confirmed</span>';
+    var liveHtml = offer.isLive ? '<span class="status-pill live-status">' + t("live") + '</span>' : '<span class="status-pill confirmed">' + t("confirmed") + '</span>';
     var firstTag = offer.tags && offer.tags.length ? '<span class="tag">' + offer.tags[0] + '</span>' : "";
-    var startText = offer.isLive ? "Available now" : (offer.startTime || "Starting soon");
-    var paymentLabel = booking.paymentMethod ? '<div class="payment-mini">Paid with ' + booking.paymentMethod + '</div>' : "";
+    var startText = offer.isLive ? t("available_now") : (offer.startTime || t("starting_soon"));
+    var paymentLabel = booking.paymentMethod ? '<div class="payment-mini">' + t("paid_with", { method: booking.paymentMethod }) + '</div>' : "";
 
     return '' +
         '<article class="booking-card">' +
@@ -202,7 +287,7 @@ function renderBookingCard(booking, offer) {
                     paymentLabel +
                     '<div class="tag-row">' + firstTag + '</div>' +
                 '</div>' +
-                '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">Review</button>' +
+                '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">' + t("review") + '</button>' +
             '</div>' +
         '</article>';
 }
