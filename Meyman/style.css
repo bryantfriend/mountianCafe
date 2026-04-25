@@ -2599,6 +2599,127 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 .badge-confetti span:nth-child(4) { --confetti-x: 76px; }
 .badge-confetti span:nth-child(5) { --confetti-x: 125px; }
 
+.language-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 220;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(28, 28, 30, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.language-modal-overlay.hidden {
+    display: none;
+}
+
+.language-card {
+    width: min(100%, 380px);
+    background: white;
+    border-radius: 24px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.language-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.language-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.language-subtitle {
+    margin-top: 0.35rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.language-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    box-shadow: none;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.language-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.language-option {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 18px;
+    padding: 0.95rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.language-option:active {
+    transform: scale(0.98);
+}
+
+.language-option.active {
+    border-color: rgba(211, 47, 47, 0.28);
+    background: #fff6f5;
+    box-shadow: 0 8px 18px rgba(211, 47, 47, 0.08);
+}
+
+.language-flag {
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    background: #fff3e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.language-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.language-name {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.language-code {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
 @media (min-width: 420px) {
     .profile-badge-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
