@@ -8,6 +8,7 @@ var CREATE_OFFER_CATEGORIES = [
 ];
 
 var createOfferMediaData = [];
+var TRANSLATION_PROMPT = "Translate the following text into natural, friendly English for a tourism marketplace. Make it appealing and clear to travelers.";
 
 function initSellerApp() {
     initializeCreateOfferModal();
@@ -47,7 +48,9 @@ function getDefaultOfferTimeValue() {
 }
 
 function resetCreateOfferForm() {
+    document.getElementById("offer-title-local").value = "";
     document.getElementById("offer-title").value = "";
+    document.getElementById("offer-description-local").value = "";
     document.getElementById("offer-description").value = "";
     document.getElementById("offer-price").value = "";
     document.getElementById("offer-spots").value = "";
@@ -61,6 +64,8 @@ function resetCreateOfferForm() {
     document.getElementById("offer-live-toggle").checked = true;
     clearOfferMedia();
     clearOfferErrors();
+    resetTranslationAssist("title");
+    resetTranslationAssist("description");
     selectOfferCategory(CREATE_OFFER_CATEGORIES[0]);
     resetOfferLanguages();
     toggleCustomDurationField();
@@ -78,6 +83,202 @@ function resetOfferLanguages() {
 function clearOfferErrors() {
     var mediaError = document.getElementById("offer-media-error");
     if (mediaError) mediaError.classList.add("hidden");
+}
+
+function resetTranslationAssist(fieldKey) {
+    var errorEl = document.getElementById(fieldKey + "-translation-error");
+    var cardEl = document.getElementById(fieldKey + "-suggestion-card");
+    var textEl = document.getElementById(fieldKey + "-suggestion-text");
+    var spinnerEl = document.getElementById(fieldKey + "-translate-spinner");
+
+    if (errorEl) {
+        errorEl.classList.add("hidden");
+        errorEl.textContent = "";
+    }
+    if (cardEl) cardEl.classList.add("hidden");
+    if (textEl) textEl.value = "";
+    if (spinnerEl) spinnerEl.classList.add("hidden");
+}
+
+function setTranslationLoading(fieldKey, isLoading) {
+    var spinnerEl = document.getElementById(fieldKey + "-translate-spinner");
+    if (spinnerEl) spinnerEl.classList.toggle("hidden", !isLoading);
+}
+
+function getTranslationFieldConfig(fieldKey) {
+    if (fieldKey === "title") {
+        return {
+            sourceId: "offer-title-local",
+            targetId: "offer-title",
+            sourceLabel: "title"
+        };
+    }
+
+    return {
+        sourceId: "offer-description-local",
+        targetId: "offer-description",
+        sourceLabel: "description"
+    };
+}
+
+function showTranslationError(fieldKey, message) {
+    var errorEl = document.getElementById(fieldKey + "-translation-error");
+    if (!errorEl) return;
+    errorEl.textContent = message;
+    errorEl.classList.remove("hidden");
+}
+
+function showTranslationSuggestion(fieldKey, suggestion) {
+    var cardEl = document.getElementById(fieldKey + "-suggestion-card");
+    var textEl = document.getElementById(fieldKey + "-suggestion-text");
+    var errorEl = document.getElementById(fieldKey + "-translation-error");
+
+    if (errorEl) {
+        errorEl.textContent = "";
+        errorEl.classList.add("hidden");
+    }
+
+    if (textEl) textEl.value = suggestion;
+    if (cardEl) cardEl.classList.remove("hidden");
+}
+
+function escapeForJson(text) {
+    return String(text)
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"')
+        .replace(/\r/g, "\\r")
+        .replace(/\n/g, "\\n");
+}
+
+function buildTranslationRequestBody(text) {
+    return '{"prompt":"' + escapeForJson(TRANSLATION_PROMPT) + '","text":"' + escapeForJson(text) + '"}';
+}
+
+function cleanTranslationResponse(data) {
+    if (!data) return "";
+    if (typeof data.translation === "string") return data.translation.trim();
+    if (typeof data.text === "string") return data.text.trim();
+    if (typeof data.result === "string") return data.result.trim();
+    if (typeof data.output === "string") return data.output.trim();
+    return "";
+}
+
+function titleCaseText(text) {
+    var words = String(text || "").toLowerCase().split(/\s+/);
+    var result = [];
+    for (var i = 0; i < words.length; i++) {
+        if (!words[i]) continue;
+        result.push(words[i].charAt(0).toUpperCase() + words[i].slice(1));
+    }
+    return result.join(" ");
+}
+
+function getDemoTranslationSuggestion(text, fieldKey) {
+    var result = "English version: " + String(text || "").trim();
+    var replacements = [
+        { pattern: /ужин|кечки тамак|кечки/gi, value: "dinner" },
+        { pattern: /чай|tea|чай ичүү/gi, value: "tea" },
+        { pattern: /боорсок|боорсок жасоо/gi, value: "boorsok" },
+        { pattern: /мастер[- ]?класс|сабак/gi, value: "workshop" },
+        { pattern: /тамак|еда/gi, value: "meal" },
+        { pattern: /жылуу|уютный|комфортный/gi, value: "warm" },
+        { pattern: /традиционный|салттуу/gi, value: "traditional" },
+        { pattern: /кыргызский|кыргызча|kyrgyz/gi, value: "Kyrgyz" },
+        { pattern: /үйдө|домашний|дом/gi, value: "home" },
+        { pattern: /опыт|тажрыйба/gi, value: "experience" }
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        result = result.replace(replacements[i].pattern, replacements[i].value);
+    }
+
+    result = result.replace(/\s+/g, " ").trim();
+
+    if (fieldKey === "title") {
+        result = result.replace(/^English version:\s*/i, "");
+        result = titleCaseText(result);
+    } else {
+        result = result.replace(/^English version:\s*/i, "");
+        if (result && result.indexOf(".") === -1) {
+            result = result + ".";
+        }
+        result = "Enjoy a " + result.charAt(0).toLowerCase() + result.slice(1);
+    }
+
+    return result;
+}
+
+function requestTranslationSuggestion(text, fieldKey) {
+    return fetch("/translate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: buildTranslationRequestBody(text)
+    }).then(function(response) {
+        if (!response.ok) {
+            throw new Error("Translation request failed");
+        }
+        return response.json();
+    }).then(function(data) {
+        var translated = cleanTranslationResponse(data);
+        if (!translated) {
+            throw new Error("Empty translation");
+        }
+        return translated;
+    }).catch(function() {
+        return getDemoTranslationSuggestion(text, fieldKey);
+    });
+}
+
+function translateOfferField(fieldKey) {
+    var config = getTranslationFieldConfig(fieldKey);
+    var sourceInput = document.getElementById(config.sourceId);
+    var sourceText = sourceInput ? sourceInput.value.trim() : "";
+
+    resetTranslationAssist(fieldKey);
+
+    if (!sourceText) {
+        showTranslationError(fieldKey, "Add your " + config.sourceLabel + " in Kyrgyz or Russian first.");
+        return;
+    }
+
+    setTranslationLoading(fieldKey, true);
+
+    requestTranslationSuggestion(sourceText, fieldKey).then(function(suggestion) {
+        showTranslationSuggestion(fieldKey, suggestion);
+    }).catch(function() {
+        showTranslationError(fieldKey, "We could not translate that right now. Please try again.");
+    }).finally(function() {
+        setTranslationLoading(fieldKey, false);
+    });
+}
+
+function acceptTranslationSuggestion(fieldKey) {
+    var config = getTranslationFieldConfig(fieldKey);
+    var suggestionInput = document.getElementById(fieldKey + "-suggestion-text");
+    var targetInput = document.getElementById(config.targetId);
+    var cardEl = document.getElementById(fieldKey + "-suggestion-card");
+
+    if (suggestionInput && targetInput) {
+        targetInput.value = suggestionInput.value.trim();
+    }
+    if (cardEl) cardEl.classList.add("hidden");
+}
+
+function editTranslationSuggestion(fieldKey) {
+    var config = getTranslationFieldConfig(fieldKey);
+    var suggestionInput = document.getElementById(fieldKey + "-suggestion-text");
+    var targetInput = document.getElementById(config.targetId);
+
+    if (suggestionInput && targetInput) {
+        targetInput.value = suggestionInput.value.trim();
+        targetInput.focus();
+        if (targetInput.setSelectionRange) {
+            var length = targetInput.value.length;
+            targetInput.setSelectionRange(length, length);
+        }
+    }
 }
 
 function clearOfferMedia() {
@@ -681,7 +882,9 @@ function closeCreateModal() {
 }
 
 function submitNewOffer() {
+    var titleLocalInput = document.getElementById("offer-title-local").value.trim();
     var titleInput = document.getElementById("offer-title").value.trim();
+    var descriptionLocalInput = document.getElementById("offer-description-local").value.trim();
     var descriptionInput = document.getElementById("offer-description").value.trim();
     var priceInput = document.getElementById("offer-price").value;
     var spotsInput = document.getElementById("offer-spots").value;
@@ -697,7 +900,9 @@ function submitNewOffer() {
 
     var payload = {
         title: titleInput,
+        titleLocal: titleLocalInput,
         description: descriptionInput,
+        descriptionLocal: descriptionLocalInput,
         price: priceInput,
         spots: spotsInput,
         category: categoryInput,

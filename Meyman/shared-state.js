@@ -361,7 +361,9 @@ function normalizeAction(actionType, payload) {
     var normalized = Object.assign({}, payload);
     if (actionType === "CREATE_OFFER") {
         normalized.title = String(payload.title).trim();
+        normalized.titleLocal = String(payload.titleLocal || "").trim();
         normalized.description = String(payload.description || "").trim();
+        normalized.descriptionLocal = String(payload.descriptionLocal || "").trim();
         normalized.price = Number(payload.price) || 0;
         normalized.spots = Number(payload.spots) || 1;
         normalized.category = String(payload.category).trim();
@@ -437,7 +439,9 @@ function processAction(actionType, currentState, context) {
         var newOffer = {
             id: context.offerId,
             title: context.title,
+            titleLocal: context.titleLocal,
             description: context.description,
+            descriptionLocal: context.descriptionLocal,
             price: context.price,
             spots: context.spots,
             category: context.category,

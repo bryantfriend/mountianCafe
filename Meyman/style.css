@@ -1457,6 +1457,75 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     gap: 0.65rem;
 }
 
+.translate-assist-btn {
+    margin-top: 0.65rem;
+    border: none;
+    background: #fff3e0;
+    color: #9a3412;
+    border-radius: 14px;
+    padding: 0.72rem 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-sm);
+}
+
+.translate-assist-btn:active {
+    transform: scale(0.97);
+}
+
+.translate-assist-icon {
+    font-size: 0.95rem;
+}
+
+.translate-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(154, 52, 18, 0.2);
+    border-top-color: #9a3412;
+    animation: spin 0.8s linear infinite;
+}
+
+.translation-suggestion-card {
+    margin-top: 0.75rem;
+    padding: 0.95rem;
+    background: #fffaf2;
+    border: 1px solid rgba(255, 152, 0, 0.24);
+    border-radius: 18px;
+}
+
+.translation-suggestion-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #9a3412;
+    margin-bottom: 0.55rem;
+}
+
+.translation-suggestion-input {
+    min-height: 88px;
+    background: white;
+}
+
+.translation-suggestion-large {
+    min-height: 128px;
+}
+
+.translation-actions {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+}
+
+.translation-action-btn {
+    width: auto;
+    flex: 1;
+    padding: 0.8rem 0.9rem;
+}
+
 .category-select-pill {
     border: 1px solid var(--border-color);
     background: white;
@@ -2511,6 +2580,11 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 @keyframes feedbackIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 @keyframes confettiPop {

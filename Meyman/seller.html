@@ -192,14 +192,54 @@
                             <h3>Basic info</h3>
                         </div>
                         <div class="form-group">
-                            <label id="create-offer-label">What are you offering?</label>
+                            <label for="offer-title-local">Title (Local)</label>
                             <div class="input-shell">
                                 <span class="input-icon">✨</span>
+                                <input type="text" id="offer-title-local" class="form-control with-icon" placeholder="Write in Kyrgyz or Russian">
+                            </div>
+                            <button type="button" class="translate-assist-btn" onclick="translateOfferField('title')">
+                                <span class="translate-assist-icon">🌍</span>
+                                <span>Translate to English</span>
+                                <span class="translate-spinner hidden" id="title-translate-spinner"></span>
+                            </button>
+                            <div class="field-hint">Use your natural wording first, then generate an English version for travelers.</div>
+                            <div id="title-translation-error" class="field-error hidden"></div>
+                            <div id="title-suggestion-card" class="translation-suggestion-card hidden">
+                                <div class="translation-suggestion-label">Suggested English:</div>
+                                <textarea id="title-suggestion-text" class="form-control translation-suggestion-input"></textarea>
+                                <div class="translation-actions">
+                                    <button type="button" class="btn btn-primary translation-action-btn" onclick="acceptTranslationSuggestion('title')">Accept</button>
+                                    <button type="button" class="btn btn-outline translation-action-btn" onclick="editTranslationSuggestion('title')">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="create-offer-label" for="offer-title">Title (English)</label>
+                            <div class="input-shell">
+                                <span class="input-icon">📝</span>
                                 <input type="text" id="offer-title" class="form-control with-icon" placeholder="Example: Home cooked dinner">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="offer-description">Description</label>
+                            <label for="offer-description-local">Description (Local)</label>
+                            <textarea id="offer-description-local" class="form-control create-textarea" placeholder="Describe the experience in Kyrgyz or Russian..."></textarea>
+                            <button type="button" class="translate-assist-btn" onclick="translateOfferField('description')">
+                                <span class="translate-assist-icon">🌍</span>
+                                <span>Translate to English</span>
+                                <span class="translate-spinner hidden" id="description-translate-spinner"></span>
+                            </button>
+                            <div id="description-translation-error" class="field-error hidden"></div>
+                            <div id="description-suggestion-card" class="translation-suggestion-card hidden">
+                                <div class="translation-suggestion-label">Suggested English:</div>
+                                <textarea id="description-suggestion-text" class="form-control translation-suggestion-input translation-suggestion-large"></textarea>
+                                <div class="translation-actions">
+                                    <button type="button" class="btn btn-primary translation-action-btn" onclick="acceptTranslationSuggestion('description')">Accept</button>
+                                    <button type="button" class="btn btn-outline translation-action-btn" onclick="editTranslationSuggestion('description')">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-description">Description (English)</label>
                             <textarea id="offer-description" class="form-control create-textarea" placeholder="Describe the experience in detail..."></textarea>
                         </div>
                         <div class="form-group">
