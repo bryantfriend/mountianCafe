@@ -4,6 +4,337 @@ function initSellerApp() {
     refreshDashboard();
 }
 
+function getSellerOfferImage(offer) {
+    if (offer.image) return offer.image;
+    if (typeof getCategoryCoverImage === "function") return getCategoryCoverImage(offer.category);
+    return "https://source.unsplash.com/800x600/?kyrgyzstan,travel";
+}
+
+function getProviderDashboardState() {
+    var state = loadState();
+    var offers = (state.offers || []).slice();
+    var bookings = state.bookings || [];
+    var reviews = state.reviews || [];
+    var completedBookings = bookings.length;
+    var totalEarned = 0;
+    var pendingPayments = 0;
+    var weeklyBuckets = [2200, 3400, 1800, 4200, 2900, 5100, 3900];
+    var serviceSummaries = [];
+    var flags = [];
+    var reviewMap = {};
+    var reviewTotal = 0;
+
+    for (var r = 0; r < reviews.length; r++) {
+        reviewTotal += reviews[r].rating;
+        if (!reviewMap[reviews[r].offerId]) reviewMap[reviews[r].offerId] = [];
+        reviewMap[reviews[r].offerId].push(reviews[r]);
+    }
+
+    for (var i = 0; i < offers.length; i++) {
+        var offer = offers[i];
+        var offerBookings = 0;
+        for (var b = 0; b < bookings.length; b++) {
+            if (bookings[b].offerId === offer.id) offerBookings++;
+        }
+
+        var offerEarned = offer.price * offerBookings;
+        totalEarned += offerEarned;
+
+        if (offer.isLive || offerBookings === 0) {
+            pendingPayments += Math.round(offer.price * 0.12);
+        }
+
+        var offerReviews = reviewMap[offer.id] || [];
+        var offerRating = offer.rating || 0;
+        if (offerReviews.length) {
+            var offerReviewTotal = 0;
+            for (var orx = 0; orx < offerReviews.length; orx++) offerReviewTotal += offerReviews[orx].rating;
+            offerRating = offerReviewTotal / offerReviews.length;
+        }
+
+        var needsFix = offerRating < 4.0 || !offer.image || offerBookings === 0;
+        serviceSummaries.push({
+            id: offer.id,
+            title: offer.title,
+            image: getSellerOfferImage(offer),
+            price: offer.price,
+            rating: offerRating.toFixed(1),
+            status: needsFix ? "Needs Fix" : "Active",
+            bookings: offerBookings
+        });
+
+        if (offerRating < 4.0) {
+            flags.push({
+                serviceId: offer.id,
+                message: offer.title + " has a low rating (" + offerRating.toFixed(1) + "⭐)",
+                action: "Fix Now"
+            });
+        }
+        if (!offer.image) {
+            flags.push({
+                serviceId: offer.id,
+                message: "Add photos to " + offer.title + " to increase bookings",
+                action: "Fix Now"
+            });
+        }
+        if (offerBookings === 0) {
+            flags.push({
+                serviceId: offer.id,
+                message: offer.title + " has no bookings yet - refresh pricing or photos",
+                action: "Fix Now"
+            });
+        }
+    }
+
+    if (flags.length === 0 && offers.length) {
+        flags.push({
+            serviceId: "",
+            message: "Everything looks good ✅",
+            action: ""
+        });
+    }
+
+    var avgRating = reviews.length ? (reviewTotal / reviews.length) : 4.7;
+    var profileSuggestions = [];
+    if (offers.length < 4) profileSuggestions.push("Add more services");
+    if (flags.length > 0 && flags[0].action) profileSuggestions.push("Resolve service issues");
+    profileSuggestions.push("Add more photos");
+    profileSuggestions.push("Update availability");
+
+    return {
+        providerName: "Aizada | Nomad Host",
+        joinedLabel: "Joined April 2026",
+        trustBadge: "Trusted Local ⭐",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
+        totalEarned: totalEarned || 24500,
+        avgRating: avgRating.toFixed(1),
+        guestsServed: completedBookings || 128,
+        completionRate: completedBookings ? 96 : 96,
+        pendingPayments: pendingPayments || 3600,
+        platformFeePercent: 12,
+        weeklyEarnings: weeklyBuckets,
+        services: serviceSummaries.slice(0, 6),
+        reviews: reviews.slice().sort(function(a, b) {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        }).slice(0, 3),
+        flags: flags.slice(0, 3),
+        profileStrength: 70,
+        profileSuggestions: profileSuggestions.slice(0, 3)
+    };
+}
+
+function renderMiniBarChart(values) {
+    var max = 1;
+    for (var i = 0; i < values.length; i++) {
+        if (values[i] > max) max = values[i];
+    }
+
+    var html = '<div class="mini-chart">';
+    for (var j = 0; j < values.length; j++) {
+        var height = Math.max(18, Math.round((values[j] / max) * 72));
+        html += '<div class="mini-bar-wrap"><div class="mini-bar" style="height:' + height + 'px;"></div></div>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderProviderServices(services) {
+    var html = '<div class="provider-services-row">';
+    for (var i = 0; i < services.length; i++) {
+        var service = services[i];
+        var statusClass = service.status === "Active" ? "is-active" : "is-warning";
+        html += '' +
+            '<article class="provider-service-card">' +
+                '<div class="provider-service-thumb" style="background-image:url(\'' + service.image + '\');"></div>' +
+                '<div class="provider-service-body">' +
+                    '<div class="provider-service-title">' + service.title + '</div>' +
+                    '<div class="provider-service-meta">' + service.price + ' KGS • ⭐ ' + service.rating + '</div>' +
+                    '<div class="provider-service-status ' + statusClass + '">' + service.status + '</div>' +
+                    '<div class="provider-service-actions">' +
+                        '<button class="btn btn-outline provider-inline-btn" onclick="openProviderServiceManager(\'' + service.id + '\', \'edit\')">Edit</button>' +
+                        '<button class="btn btn-primary provider-inline-btn" onclick="openProviderServiceManager(\'' + service.id + '\', \'view\')">View</button>' +
+                    '</div>' +
+                '</div>' +
+            '</article>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderProviderReviews(reviews, state) {
+    if (!reviews.length) {
+        return '<div class="provider-empty-note">No guest feedback yet.</div>';
+    }
+
+    var html = '<div class="provider-review-list">';
+    for (var i = 0; i < reviews.length; i++) {
+        var review = reviews[i];
+        var offer = findOfferById(state.offers || [], review.offerId);
+        html += '' +
+            '<article class="provider-review-card">' +
+                '<div class="provider-review-top">' +
+                    '<div>' +
+                        '<div class="provider-review-name">' + review.customerName + '</div>' +
+                        '<div class="provider-review-service">' + (offer ? offer.title : "Guest review") + '</div>' +
+                    '</div>' +
+                    '<div class="provider-review-rating">⭐ ' + review.rating + '</div>' +
+                '</div>' +
+                '<p class="provider-review-comment">' + review.comment + '</p>' +
+                '<button class="btn btn-outline provider-inline-btn" onclick="replyToReview(\'' + review.id + '\')">Reply</button>' +
+            '</article>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderFlags(flags) {
+    if (!flags.length) {
+        return '<div class="provider-empty-note success-note">Everything looks good ✅</div>';
+    }
+
+    var html = '<div class="provider-flag-list">';
+    for (var i = 0; i < flags.length; i++) {
+        var flag = flags[i];
+        if (!flag.action) {
+            html += '<div class="provider-empty-note success-note">' + flag.message + '</div>';
+            continue;
+        }
+        html += '' +
+            '<div class="provider-flag-item">' +
+                '<div class="provider-flag-copy">' + flag.message + '</div>' +
+                '<button class="btn btn-primary provider-inline-btn" onclick="openProviderServiceManager(\'' + flag.serviceId + '\', \'edit\')">' + flag.action + '</button>' +
+            '</div>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderProviderDashboardModal() {
+    var dashboard = getProviderDashboardState();
+    var state = loadState();
+    var sheet = document.getElementById("dummy-feature-sheet");
+
+    var htmlContent = '<div class="sheet-handle"></div>';
+    htmlContent += '<div class="provider-dashboard">';
+    htmlContent += '<div class="provider-header-card">';
+    htmlContent += '<img class="provider-avatar" src="' + dashboard.avatar + '" alt="' + dashboard.providerName + '">';
+    htmlContent += '<div class="provider-header-copy">';
+    htmlContent += '<div class="provider-name">' + dashboard.providerName + '</div>';
+    htmlContent += '<div class="provider-subtext">' + dashboard.joinedLabel + '</div>';
+    htmlContent += '<div class="provider-trust-badge">' + dashboard.trustBadge + '</div>';
+    htmlContent += '</div>';
+    htmlContent += '<button class="btn btn-outline provider-public-btn" onclick="openProviderServiceManager(\'\', \'public\')">View Public Profile</button>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="provider-stats-grid">';
+    htmlContent += '<div class="provider-stat-card"><div class="provider-stat-label">💰 Total Earned</div><div class="provider-stat-value">' + dashboard.totalEarned.toLocaleString() + ' KGS</div></div>';
+    htmlContent += '<div class="provider-stat-card"><div class="provider-stat-label">⭐ Rating</div><div class="provider-stat-value">' + dashboard.avgRating + '</div></div>';
+    htmlContent += '<div class="provider-stat-card"><div class="provider-stat-label">🧑‍🤝‍🧑 Guests Served</div><div class="provider-stat-value">' + dashboard.guestsServed + '</div></div>';
+    htmlContent += '<div class="provider-stat-card"><div class="provider-stat-label">✅ Completion Rate</div><div class="provider-stat-value">' + dashboard.completionRate + '%</div></div>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="provider-section-header"><h3>Your Services</h3><button class="provider-link-btn" onclick="openCreateModal(); closeDummyFeature();">+ Add Service</button></div>';
+    htmlContent += renderProviderServices(dashboard.services);
+
+    htmlContent += '<div class="provider-panel">';
+    htmlContent += '<div class="provider-section-header compact"><h3>Earnings</h3></div>';
+    htmlContent += '<div class="provider-earnings-grid">';
+    htmlContent += '<div><div class="provider-meta-label">Total Earned</div><div class="provider-money">' + dashboard.totalEarned.toLocaleString() + ' KGS</div></div>';
+    htmlContent += '<div><div class="provider-meta-label">Pending Payments</div><div class="provider-money muted">' + dashboard.pendingPayments.toLocaleString() + ' KGS</div></div>';
+    htmlContent += '<div><div class="provider-meta-label">Platform Fee</div><div class="provider-money muted">' + dashboard.platformFeePercent + '% due</div></div>';
+    htmlContent += '</div>';
+    htmlContent += renderMiniBarChart(dashboard.weeklyEarnings);
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="provider-panel">';
+    htmlContent += '<div class="provider-section-header compact"><h3>Guest Feedback</h3></div>';
+    htmlContent += '<div class="provider-rating-hero">' + dashboard.avgRating + '<span>/5</span></div>';
+    htmlContent += renderProviderReviews(dashboard.reviews, state);
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="provider-panel">';
+    htmlContent += '<div class="provider-section-header compact"><h3>Needs Attention ⚠️</h3></div>';
+    htmlContent += renderFlags(dashboard.flags);
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="provider-panel">';
+    htmlContent += '<div class="provider-section-header compact"><h3>Profile Strength</h3><button class="btn btn-outline provider-inline-btn" onclick="openBadgesModal()">🏅 View Badges</button></div>';
+    htmlContent += '<div class="profile-strength-row"><div class="profile-strength-bar"><span style="width:' + dashboard.profileStrength + '%;"></span></div><div class="profile-strength-value">' + dashboard.profileStrength + '%</div></div>';
+    htmlContent += '<div class="profile-strength-list">';
+    for (var p = 0; p < dashboard.profileSuggestions.length; p++) {
+        htmlContent += '<div class="profile-strength-item">' + dashboard.profileSuggestions[p] + '</div>';
+    }
+    htmlContent += '</div></div>';
+
+    htmlContent += '<div class="provider-panel provider-settings-panel">';
+    htmlContent += '<button class="provider-settings-btn" onclick="openDummyFeature(\'Payments\')">Payment Methods <span>→</span></button>';
+    htmlContent += '<button class="provider-settings-btn" onclick="openDummyFeature(\'Language\')">Language (EN) <span>→</span></button>';
+    htmlContent += '<button class="provider-settings-btn is-danger" onclick="closeDummyFeature()">Log Out <span>→</span></button>';
+    htmlContent += '</div>';
+
+    htmlContent += '</div>';
+
+    sheet.innerHTML = htmlContent;
+    document.getElementById("dummy-feature-modal").classList.remove("hidden");
+}
+
+function renderHostBadgesModal() {
+    var badgesSheet = document.getElementById("badges-sheet");
+    badgesSheet.innerHTML =
+        '<div class="sheet-handle"></div>' +
+        '<div class="provider-section-header compact">' +
+            '<h3>Your Badges</h3>' +
+            '<button class="btn-icon provider-badge-close" onclick="closeBadgesModal()">✕</button>' +
+        '</div>' +
+        '<div class="provider-badges-wrap">' + renderBadgeGrid({ group: "host" }) + '</div>';
+}
+
+function openBadgesModal() {
+    renderHostBadgesModal();
+    document.getElementById("badges-modal").classList.remove("hidden");
+}
+
+function closeBadgesModal() {
+    document.getElementById("badges-modal").classList.add("hidden");
+}
+
+function openProviderServiceManager(serviceId, mode) {
+    var state = loadState();
+    var offer = serviceId ? findOfferById(state.offers || [], serviceId) : null;
+
+    if (mode === "public") {
+        alert("Public provider profile preview opened for demo.");
+        return;
+    }
+
+    if (!offer) {
+        if (mode === "edit") {
+            closeDummyFeature();
+            openCreateModal();
+        }
+        return;
+    }
+
+    var sheet = document.getElementById("dummy-feature-sheet");
+    sheet.innerHTML =
+        '<div class="sheet-handle"></div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<h2 style="font-size:1.5rem; color:var(--text-primary);">' + (mode === "edit" ? "Edit Service" : "Service Details") + '</h2>' +
+            '<button class="btn-icon" style="box-shadow:none; border:none; width:36px; height:36px; background:var(--border-color); color:var(--text-primary);" onclick="closeDummyFeature()">✕</button>' +
+        '</div>' +
+        '<div class="provider-service-detail">' +
+            '<div class="provider-service-thumb large" style="background-image:url(\'' + getSellerOfferImage(offer) + '\');"></div>' +
+            '<div class="provider-service-title">' + offer.title + '</div>' +
+            '<div class="provider-service-meta">' + offer.price + ' KGS • ⭐ ' + offer.rating + '</div>' +
+            '<div class="tag-row">' + (offer.tags ? '<span class="tag">' + offer.tags.join('</span><span class="tag">') + '</span>' : '') + '</div>' +
+            '<button class="btn btn-primary" style="margin-top:1rem;" onclick="alert(\'Quick edit tools coming next.\')">' + (mode === "edit" ? "Fix This Service" : "Edit Service") + '</button>' +
+        '</div>';
+}
+
+function replyToReview(reviewId) {
+    alert("Reply composer opened for review " + reviewId + ".");
+}
+
 // Ensure no arrow functions as per ICF Rules
 function refreshDashboard() {
     var currentState = loadState();
@@ -56,7 +387,7 @@ function refreshDashboard() {
             var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
             var availabilityText = offer.isLive ? "Available now" : (offer.startTime || offer.urgency || "Starting soon");
             var htmlString = 
-                '<div class="offer-card-img" style="background-image:url(\'https://images.unsplash.com/photo-1541843666579-166fb9c072eb?auto=format&fit=crop&w=400&q=80\');">' +
+                '<div class="offer-card-img" style="background-image:url(\'' + getSellerOfferImage(offer) + '\');">' +
                     liveHtml +
                 '</div>' +
                 '<div class="offer-card-body">' +
@@ -128,7 +459,7 @@ function openCreateModal() {
     document.getElementById("offer-title").value = "";
     document.getElementById("offer-price").value = "";
     document.getElementById("offer-spots").value = "";
-    document.getElementById("offer-category").value = "Food";
+    document.getElementById("offer-category").value = "Eat Like a Local 🍽️";
 
     document.getElementById("create-modal").classList.remove("hidden");
 }
@@ -237,14 +568,12 @@ function openDummyFeature(featureName) {
         htmlContent += '<div style="display:flex; align-items:center; gap:12px; padding-bottom:1rem; border-bottom:1px solid var(--border-color);"><div style="width:48px; height:48px; border-radius:50%; background:#fce4ec; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">👩</div><div style="flex:1;"><div style="display:flex; justify-content:space-between;"><span style="font-weight:700;">Sarah M.</span><span style="font-size:0.75rem; color:var(--text-secondary);">Yesterday</span></div><div style="font-size:0.9rem; color:var(--text-primary); font-weight:600; margin-top:2px;">Is the meeting point still at...</div></div><div style="width:10px; height:10px; border-radius:50%; background:var(--primary);"></div></div>';
         htmlContent += '</div>';
     } else if (featureName === 'Profile') {
-        htmlContent += '<div style="margin-top:1.5rem; text-align:center; display:flex; flex-direction:column; align-items:center;">';
-        htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:url(\'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200\') center/cover; margin-bottom:1rem;"></div>';
-        htmlContent += '<h3 style="font-size:1.3rem;">Aigul</h3>';
-        htmlContent += '<p style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">Superhost in Bishkek</p>';
-        htmlContent += '<button class="btn btn-primary" style="margin-top:1rem;" onclick="openHostConduct()">Start Verification</button>';
-        htmlContent += '<button class="btn btn-outline" style="margin-top:1.5rem;">Edit Profile</button>';
-        htmlContent += '</div>';
-        htmlContent += '<div data-profile-badges="host">' + renderBadgeGrid({ group: "host" }) + '</div>';
+        renderProviderDashboardModal();
+        return;
+    } else if (featureName === 'Payments') {
+        htmlContent += '<div class="provider-empty-note">Linked payouts: MBANK, Visa / MasterCard, and cash terminals.</div>';
+    } else if (featureName === 'Language') {
+        htmlContent += '<div class="provider-empty-note">Language preferences will live here. English is active for the demo.</div>';
     }
 
     sheet.innerHTML = htmlContent;
