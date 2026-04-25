@@ -490,10 +490,10 @@ function openOfferModal(index) {
 
     document.getElementById("booking-modal").classList.remove("hidden");
     
-    // Set default half-visible state
-    sheet.style.transform = 'translateY(30%)';
+    // Open fully expanded by default
+    sheet.style.transform = 'translateY(0%)';
     setTimeout(function() {
-        sheet.style.transform = 'translateY(30%)';
+        sheet.style.transform = 'translateY(0%)';
     }, 10);
 }
 
@@ -525,8 +525,6 @@ function setupBottomSheetDrag() {
         var threshold = window.innerHeight * 0.2;
         if (currentY > threshold * 2) {
             closeOfferModal();
-        } else if (currentY > threshold) {
-            sheet.style.transform = 'translateY(30%)'; // Snap half
         } else {
             sheet.style.transform = 'translateY(0%)'; // Snap full
         }
