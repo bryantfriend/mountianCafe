@@ -1,7 +1,224 @@
 // Seller App Logic (ICF Compliant)
 
+var CREATE_OFFER_CATEGORIES = [
+    "Eat Like a Local 🍽️",
+    "Nomad Life 🏔️",
+    "Culture & Craft 🎨",
+    "Essentials 🧼"
+];
+
+var createOfferMediaData = [];
+
 function initSellerApp() {
+    initializeCreateOfferModal();
     refreshDashboard();
+}
+
+function initializeCreateOfferModal() {
+    var mediaInput = document.getElementById("offer-media-input");
+    var durationSelect = document.getElementById("offer-duration");
+    var categoryPills = document.querySelectorAll(".category-select-pill");
+
+    if (mediaInput && !mediaInput.dataset.bound) {
+        mediaInput.addEventListener("change", handleOfferMediaSelection);
+        mediaInput.dataset.bound = "true";
+    }
+
+    if (durationSelect && !durationSelect.dataset.bound) {
+        durationSelect.addEventListener("change", toggleCustomDurationField);
+        durationSelect.dataset.bound = "true";
+    }
+
+    for (var i = 0; i < categoryPills.length; i++) {
+        if (categoryPills[i].dataset.bound) continue;
+        categoryPills[i].addEventListener("click", function() {
+            selectOfferCategory(this.getAttribute("data-category"));
+        });
+        categoryPills[i].dataset.bound = "true";
+    }
+}
+
+function getDefaultOfferDateValue() {
+    return new Date().toISOString().split("T")[0];
+}
+
+function getDefaultOfferTimeValue() {
+    return "18:00";
+}
+
+function resetCreateOfferForm() {
+    document.getElementById("offer-title").value = "";
+    document.getElementById("offer-description").value = "";
+    document.getElementById("offer-price").value = "";
+    document.getElementById("offer-spots").value = "";
+    document.getElementById("offer-date").value = getDefaultOfferDateValue();
+    document.getElementById("offer-time").value = getDefaultOfferTimeValue();
+    document.getElementById("offer-duration").value = "1h";
+    document.getElementById("offer-duration-custom").value = "";
+    document.getElementById("offer-location-text").value = "Bishkek city center";
+    document.getElementById("offer-included").value = "";
+    document.getElementById("offer-notes").value = "";
+    document.getElementById("offer-live-toggle").checked = true;
+    clearOfferMedia();
+    clearOfferErrors();
+    selectOfferCategory(CREATE_OFFER_CATEGORIES[0]);
+    resetOfferLanguages();
+    toggleCustomDurationField();
+}
+
+function resetOfferLanguages() {
+    var languageSelect = document.getElementById("offer-languages");
+    if (!languageSelect) return;
+
+    for (var i = 0; i < languageSelect.options.length; i++) {
+        languageSelect.options[i].selected = languageSelect.options[i].value === "English";
+    }
+}
+
+function clearOfferErrors() {
+    var mediaError = document.getElementById("offer-media-error");
+    if (mediaError) mediaError.classList.add("hidden");
+}
+
+function clearOfferMedia() {
+    createOfferMediaData = [];
+    var mediaInput = document.getElementById("offer-media-input");
+    if (mediaInput) mediaInput.value = "";
+    renderOfferMediaPreview();
+}
+
+function selectOfferCategory(category) {
+    var hiddenInput = document.getElementById("offer-category");
+    if (hiddenInput) hiddenInput.value = category;
+
+    var categoryPills = document.querySelectorAll(".category-select-pill");
+    for (var i = 0; i < categoryPills.length; i++) {
+        categoryPills[i].classList.toggle("active", categoryPills[i].getAttribute("data-category") === category);
+    }
+}
+
+function toggleCustomDurationField() {
+    var durationSelect = document.getElementById("offer-duration");
+    var customGroup = document.getElementById("offer-duration-custom-group");
+    if (!durationSelect || !customGroup) return;
+    customGroup.classList.toggle("hidden", durationSelect.value !== "custom");
+}
+
+function handleOfferMediaSelection(event) {
+    var files = event.target.files || [];
+    if (!files.length) return;
+
+    var readsRemaining = files.length;
+
+    for (var i = 0; i < files.length; i++) {
+        (function(file) {
+            var reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                createOfferMediaData.push({
+                    id: "media_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+                    name: file.name,
+                    type: file.type || "",
+                    url: loadEvent.target.result
+                });
+                readsRemaining--;
+                if (readsRemaining === 0) {
+                    renderOfferMediaPreview();
+                    clearOfferErrors();
+                }
+            };
+            reader.readAsDataURL(file);
+        })(files[i]);
+    }
+}
+
+function renderOfferMediaPreview() {
+    var preview = document.getElementById("offer-media-preview");
+    if (!preview) return;
+
+    if (!createOfferMediaData.length) {
+        preview.innerHTML = "";
+        return;
+    }
+
+    var html = "";
+    for (var i = 0; i < createOfferMediaData.length; i++) {
+        var item = createOfferMediaData[i];
+        var mediaInner = item.type.indexOf("video/") === 0
+            ? '<video src="' + item.url + '" muted playsinline></video>'
+            : '<img src="' + item.url + '" alt="' + item.name + '">';
+
+        html += '' +
+            '<div class="media-preview-card">' +
+                mediaInner +
+                '<button type="button" class="media-remove-btn" onclick="removeOfferMedia(\'' + item.id + '\')">✕</button>' +
+                (i === 0 ? '<div class="media-cover-badge">Cover</div>' : '') +
+            '</div>';
+    }
+
+    preview.innerHTML = html;
+}
+
+function removeOfferMedia(mediaId) {
+    var remaining = [];
+    for (var i = 0; i < createOfferMediaData.length; i++) {
+        if (createOfferMediaData[i].id !== mediaId) remaining.push(createOfferMediaData[i]);
+    }
+    createOfferMediaData = remaining;
+    renderOfferMediaPreview();
+}
+
+function useCurrentOfferLocation() {
+    var input = document.getElementById("offer-location-text");
+    if (!input) return;
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            input.value = "Current location (" + position.coords.latitude.toFixed(3) + ", " + position.coords.longitude.toFixed(3) + ")";
+        }, function() {
+            input.value = "Bishkek city center";
+        });
+    } else {
+        input.value = "Bishkek city center";
+    }
+}
+
+function getSelectedOfferLanguages() {
+    var select = document.getElementById("offer-languages");
+    var selected = [];
+    if (!select) return selected;
+
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].selected) selected.push(select.options[i].value);
+    }
+    return selected;
+}
+
+function getOfferDurationValue() {
+    var duration = document.getElementById("offer-duration").value;
+    if (duration !== "custom") return duration;
+
+    var customValue = document.getElementById("offer-duration-custom").value.trim();
+    return customValue || "Custom";
+}
+
+function createOfferStartLabel(isLive, dateValue, timeValue) {
+    if (isLive) return "Available now";
+    if (timeValue) return "Starting at " + timeValue;
+    if (dateValue) return "Starting on " + dateValue;
+    return "Starting soon";
+}
+
+function validateCreateOfferForm(payload) {
+    if (!createOfferMediaData.length) {
+        document.getElementById("offer-media-error").classList.remove("hidden");
+        return "Please add at least one photo or video.";
+    }
+
+    if (!payload.title || !payload.date || !payload.time || !payload.price) {
+        return "Please complete the required fields: title, date, time, and price.";
+    }
+
+    return "";
 }
 
 function getSellerOfferImage(offer) {
@@ -455,12 +672,7 @@ function refreshDashboard() {
 
 // Modal Handlers
 function openCreateModal() {
-    // Reset Form Fields
-    document.getElementById("offer-title").value = "";
-    document.getElementById("offer-price").value = "";
-    document.getElementById("offer-spots").value = "";
-    document.getElementById("offer-category").value = "Eat Like a Local 🍽️";
-
+    resetCreateOfferForm();
     document.getElementById("create-modal").classList.remove("hidden");
 }
 
@@ -469,23 +681,44 @@ function closeCreateModal() {
 }
 
 function submitNewOffer() {
-    var titleInput = document.getElementById("offer-title").value;
+    var titleInput = document.getElementById("offer-title").value.trim();
+    var descriptionInput = document.getElementById("offer-description").value.trim();
     var priceInput = document.getElementById("offer-price").value;
     var spotsInput = document.getElementById("offer-spots").value;
     var categoryInput = document.getElementById("offer-category").value;
+    var dateInput = document.getElementById("offer-date").value;
+    var timeInput = document.getElementById("offer-time").value;
+    var locationInput = document.getElementById("offer-location-text").value.trim();
+    var includedInput = document.getElementById("offer-included").value.trim();
+    var notesInput = document.getElementById("offer-notes").value.trim();
+    var languagesInput = getSelectedOfferLanguages();
+    var isLiveInput = document.getElementById("offer-live-toggle").checked;
+    var durationInput = getOfferDurationValue();
 
-    if (!titleInput || !priceInput || !spotsInput) {
-        alert("Please fill in all details.");
-        return;
-    }
-
-    // Utilize strictly the 7-stage engine from shared-state.js
     var payload = {
         title: titleInput,
+        description: descriptionInput,
         price: priceInput,
         spots: spotsInput,
-        category: categoryInput
+        category: categoryInput,
+        date: dateInput,
+        time: timeInput,
+        duration: durationInput,
+        locationText: locationInput,
+        included: includedInput,
+        notes: notesInput,
+        languages: languagesInput,
+        isLive: isLiveInput,
+        startTime: createOfferStartLabel(isLiveInput, dateInput, timeInput),
+        image: createOfferMediaData[0] ? createOfferMediaData[0].url : "",
+        media: createOfferMediaData.slice()
     };
+
+    var validationError = validateCreateOfferForm(payload);
+    if (validationError) {
+        alert(validationError);
+        return;
+    }
 
     var result = executeAction("CREATE_OFFER", payload);
 

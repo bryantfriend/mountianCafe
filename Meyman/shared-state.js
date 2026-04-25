@@ -340,7 +340,7 @@ function executeAction(actionType, payload) {
 
 function validateAction(actionType, payload) {
     if (actionType === "CREATE_OFFER") {
-        return payload && payload.title && payload.price && payload.category;
+        return payload && payload.title && payload.price && payload.category && payload.date && payload.time && payload.image;
     }
     if (actionType === "BOOK_OFFER") {
         return payload && payload.offerId !== undefined;
@@ -361,9 +361,21 @@ function normalizeAction(actionType, payload) {
     var normalized = Object.assign({}, payload);
     if (actionType === "CREATE_OFFER") {
         normalized.title = String(payload.title).trim();
+        normalized.description = String(payload.description || "").trim();
         normalized.price = Number(payload.price) || 0;
         normalized.spots = Number(payload.spots) || 1;
         normalized.category = String(payload.category).trim();
+        normalized.date = String(payload.date || "").trim();
+        normalized.time = String(payload.time || "").trim();
+        normalized.duration = String(payload.duration || "").trim();
+        normalized.locationText = String(payload.locationText || "").trim();
+        normalized.included = String(payload.included || "").trim();
+        normalized.notes = String(payload.notes || "").trim();
+        normalized.languages = payload.languages || [];
+        normalized.isLive = !!payload.isLive;
+        normalized.startTime = String(payload.startTime || "").trim();
+        normalized.image = String(payload.image || "").trim();
+        normalized.media = payload.media || [];
     }
     if (actionType === "CREATE_REQUEST") {
         normalized.description = String(payload.description).trim();
@@ -388,9 +400,10 @@ function addContext(actionType, normalizedPayload) {
         context.distance = "220m away";
         context.badges = ["verified-host", "top-rated", "warm-welcome"];
         context.tags = ["🤝 Local host", "☕ Warm welcome"];
-        context.isLive = true;
-        context.startTime = "Available now";
-        context.image = getCategoryCoverImage(context.category);
+        context.isLive = normalizedPayload.isLive;
+        context.startTime = normalizedPayload.startTime || (normalizedPayload.isLive ? "Available now" : "Starting soon");
+        context.image = normalizedPayload.image || getCategoryCoverImage(context.category);
+        context.media = normalizedPayload.media || [];
         context.location = {
             // Random location offset for UI map positioning
             x: Math.floor(Math.random() * 80) + 10,
@@ -424,14 +437,23 @@ function processAction(actionType, currentState, context) {
         var newOffer = {
             id: context.offerId,
             title: context.title,
+            description: context.description,
             price: context.price,
             spots: context.spots,
             category: context.category,
+            date: context.date,
+            time: context.time,
+            duration: context.duration,
+            locationText: context.locationText,
+            included: context.included,
+            notes: context.notes,
+            languages: context.languages,
             hostName: context.hostName,
             hostImage: context.hostImage,
             rating: context.rating,
             distance: context.distance,
             image: context.image,
+            media: context.media,
             badges: context.badges,
             tags: context.tags,
             isLive: context.isLive,

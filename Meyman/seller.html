@@ -23,9 +23,9 @@
             <!-- Hero Section -->
             <div class="seller-hero">
                 <div class="seller-hero-content">
-                    <h1>Salam, Aigul! 👋</h1>
-                    <div class="location">📍 Bishkek, Kyrgyzstan</div>
-                    <button class="hero-onboarding-btn" onclick="openHostConduct()">Code of Conduct</button>
+                    <h1 id="seller-greeting">Salam, Aigul! 👋</h1>
+                    <div class="location" id="seller-location">📍 Bishkek, Kyrgyzstan</div>
+                    <button class="hero-onboarding-btn" id="seller-conduct-btn" onclick="openHostConduct()">Code of Conduct</button>
                 </div>
                 <div class="seller-avatar"></div>
             </div>
@@ -34,10 +34,10 @@
             <section class="host-conduct-card">
                 <div class="host-conduct-icon">✅</div>
                 <div class="host-conduct-copy">
-                    <h2>Host Code of Conduct</h2>
-                    <p>Complete 4 quick scenarios to unlock Verified Host.</p>
+                    <h2 id="host-conduct-title">Host Code of Conduct</h2>
+                    <p id="host-conduct-desc">Complete 4 quick scenarios to unlock Verified Host.</p>
                 </div>
-                <button class="host-conduct-action" onclick="openHostConduct()">Start</button>
+                <button class="host-conduct-action" id="host-conduct-start" onclick="openHostConduct()">Start</button>
             </section>
 
             <!-- Stats Grid -->
@@ -45,7 +45,7 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon red">🛍️</div>
-                        Active Offers
+                        <span id="seller-stat-active-label">Active Offers</span>
                     </div>
                     <div class="stat-value" id="stat-active-offers">0</div>
                     <div class="stat-trend">↑ 2 this week</div>
@@ -53,7 +53,7 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon orange">📅</div>
-                        Total Bookings
+                        <span id="seller-stat-bookings-label">Total Bookings</span>
                     </div>
                     <div class="stat-value" id="stat-total-bookings">0</div>
                     <div class="stat-trend">↑ 5 this week</div>
@@ -61,7 +61,7 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon green">💳</div>
-                        Total Earnings
+                        <span id="seller-stat-earnings-label">Total Earnings</span>
                     </div>
                     <div class="stat-value">18,450 <span>KGS</span></div>
                     <div class="stat-trend">↑ 2,300 this week</div>
@@ -69,7 +69,7 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon purple">⭐</div>
-                        Total Reviews
+                        <span id="seller-stat-reviews-label">Total Reviews</span>
                     </div>
                     <div class="stat-value" id="stat-avg-rating">0.0</div>
                     <div class="stat-stars">
@@ -80,8 +80,8 @@
 
             <!-- Your Offers -->
             <div class="section-header">
-                <h3>Your Offers</h3>
-                <a href="#" class="view-all">View all</a>
+                <h3 id="seller-offers-title">Your Offers</h3>
+                <a href="#" class="view-all" id="seller-view-all">View all</a>
             </div>
             <div class="horizontal-feed" id="host-offers-list" style="padding-top:0;">
                 <!-- Offers will be rendered here -->
@@ -89,31 +89,31 @@
 
             <!-- Quick Actions -->
             <div class="section-header" style="margin-top:0.5rem;">
-                <h3>Quick Actions</h3>
+                <h3 id="seller-quick-actions-title">Quick Actions</h3>
             </div>
             <div class="quick-actions">
                 <button class="qa-btn" onclick="openCreateModal()">
                     <div class="qa-icon red">＋</div>
-                    <span>Create New<br>Offer</span>
+                    <span id="seller-create-action">Create New<br>Offer</span>
                 </button>
                 <button class="qa-btn" onclick="openDummyFeature('Calendar')">
                     <div class="qa-icon" style="color:var(--secondary); background:#fff3e0;">📅</div>
-                    <span>Calendar /<br>Availability</span>
+                    <span id="seller-calendar-action">Calendar /<br>Availability</span>
                 </button>
                 <button class="qa-btn" onclick="openDummyFeature('Earnings')">
                     <div class="qa-icon" style="color:#4caf50; background:#e8f5e9;">💳</div>
-                    <span>Earnings</span>
+                    <span id="seller-earnings-action">Earnings</span>
                 </button>
                 <button class="qa-btn" onclick="openDummyFeature('Messages')">
                     <div class="qa-icon" style="color:#9c27b0; background:#f3e5f5;">💬<div class="badge-red" style="top:0; right:0;">2</div></div>
-                    <span>Messages</span>
+                    <span id="seller-messages-action">Messages</span>
                 </button>
             </div>
 
             <!-- Customer Requests -->
             <div class="section-header" style="margin-top:0.5rem;">
-                <h3>Customer Requests</h3>
-                <a href="#" class="view-all">View all</a>
+                <h3 id="seller-requests-title">Customer Requests</h3>
+                <a href="#" class="view-all" id="seller-requests-view-all">View all</a>
             </div>
             <div class="requests-list" id="customer-requests-list">
                 <!-- Requests will be rendered here -->
@@ -124,22 +124,22 @@
         <nav class="bottom-nav">
             <a href="index.html" class="nav-item">
                 <span class="nav-icon" style="color:var(--text-tertiary);">🗺️</span>
-                <span>Map</span>
+                <span id="seller-nav-map">Map</span>
             </a>
             <a href="#" class="nav-item" onclick="openDummyFeature('Bookings')">
                 <span class="nav-icon" style="color:var(--text-tertiary);">📅</span>
-                <span>Bookings</span>
+                <span id="seller-nav-bookings">Bookings</span>
             </a>
             <div class="fab-wrapper">
                 <button class="fab-btn" onclick="openCreateModal()">＋</button>
             </div>
             <a href="#" class="nav-item" onclick="openDummyFeature('Messages')">
                 <span class="nav-icon" style="color:var(--text-tertiary); position:relative;">💬<div class="badge-red" style="top:-5px; right:-5px; border:none; width:14px; height:14px;">2</div></span>
-                <span>Inbox</span>
+                <span id="seller-nav-inbox">Inbox</span>
             </a>
             <a href="#" class="nav-item active" onclick="openDummyFeature('Profile')">
                 <span class="nav-icon" style="color:var(--primary);">👤</span>
-                <span style="color:var(--primary);">Profile</span>
+                <span id="seller-nav-profile" style="color:var(--primary);">Profile</span>
             </a>
         </nav>
 
@@ -159,46 +159,190 @@
 
         <!-- Create Offer Modal -->
         <div id="create-modal" class="modal-overlay hidden">
-            <div class="bottom-sheet">
+            <div class="bottom-sheet create-offer-sheet">
                 <div class="sheet-handle"></div>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2>Create an Offer</h2>
-                    <button class="btn-icon" style="box-shadow:none; border:none; width:30px; height:30px;" onclick="closeCreateModal()">✕</button>
-                </div>
-                
-                <div class="form-group">
-                    <label>What are you offering?</label>
-                    <input type="text" id="offer-title" class="form-control" placeholder="Example: Home cooked dinner">
-                </div>
-
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="offer-category" class="form-control">
-                        <option value="Eat Like a Local 🍽️">Eat Like a Local 🍽️</option>
-                        <option value="Nomad Life 🏔️">Nomad Life 🏔️</option>
-                        <option value="Culture & Craft 🎨">Culture & Craft 🎨</option>
-                        <option value="Essentials 🧼">Essentials 🧼</option>
-                    </select>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div class="form-group">
-                        <label>Price (KGS)</label>
-                        <input type="number" id="offer-price" class="form-control" placeholder="200" min="0">
+                <div class="create-offer-header">
+                    <div>
+                        <h2 id="create-offer-title">Create an Offer</h2>
+                        <p class="create-offer-subtitle">Build an experience guests can understand and book fast.</p>
                     </div>
-                    <div class="form-group">
-                        <label>Spots Available</label>
-                        <input type="number" id="offer-spots" class="form-control" placeholder="3" min="1">
-                    </div>
+                    <button class="btn-icon create-offer-close" onclick="closeCreateModal()">✕</button>
                 </div>
 
-                <button class="btn btn-primary" style="width:100%; margin-top:0.5rem;" onclick="submitNewOffer()">Publish Offer</button>
+                <div class="create-offer-body">
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Add photos or video</h3>
+                            <span>At least 1 file</span>
+                        </div>
+                        <label class="media-dropzone" for="offer-media-input">
+                            <input type="file" id="offer-media-input" accept="image/*,video/*" multiple hidden>
+                            <div class="media-dropzone-icon">📸</div>
+                            <div class="media-dropzone-copy">
+                                <strong>Add photos or video</strong>
+                                <span>Show the space, the setup, and what guests will actually do.</span>
+                            </div>
+                        </label>
+                        <div id="offer-media-error" class="field-error hidden">Please add at least one photo or video.</div>
+                        <div id="offer-media-preview" class="media-preview-grid"></div>
+                    </section>
+
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Basic info</h3>
+                        </div>
+                        <div class="form-group">
+                            <label id="create-offer-label">What are you offering?</label>
+                            <div class="input-shell">
+                                <span class="input-icon">✨</span>
+                                <input type="text" id="offer-title" class="form-control with-icon" placeholder="Example: Home cooked dinner">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-description">Description</label>
+                            <textarea id="offer-description" class="form-control create-textarea" placeholder="Describe the experience in detail..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label id="create-category-label">Category</label>
+                            <div id="offer-category-pills" class="category-pill-group">
+                                <button type="button" class="category-select-pill active" data-category="Eat Like a Local 🍽️">Eat Like a Local 🍽️</button>
+                                <button type="button" class="category-select-pill" data-category="Nomad Life 🏔️">Nomad Life 🏔️</button>
+                                <button type="button" class="category-select-pill" data-category="Culture & Craft 🎨">Culture & Craft 🎨</button>
+                                <button type="button" class="category-select-pill" data-category="Essentials 🧼">Essentials 🧼</button>
+                            </div>
+                            <input type="hidden" id="offer-category" value="Eat Like a Local 🍽️">
+                        </div>
+                    </section>
+
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Experience details</h3>
+                        </div>
+                        <div class="create-grid two-up">
+                            <div class="form-group">
+                                <label for="offer-date">Date</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">📅</span>
+                                    <input type="date" id="offer-date" class="form-control with-icon">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="offer-time">Time</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">⏰</span>
+                                    <input type="time" id="offer-time" class="form-control with-icon">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="create-grid two-up">
+                            <div class="form-group">
+                                <label for="offer-duration">Duration</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">⏳</span>
+                                    <select id="offer-duration" class="form-control with-icon">
+                                        <option value="30 min">30 min</option>
+                                        <option value="1h">1h</option>
+                                        <option value="2h">2h</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group hidden" id="offer-duration-custom-group">
+                                <label for="offer-duration-custom">Custom duration</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">✍️</span>
+                                    <input type="text" id="offer-duration-custom" class="form-control with-icon" placeholder="Example: 90 min">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-location-text">Location</label>
+                            <div class="location-input-row">
+                                <div class="input-shell grow">
+                                    <span class="input-icon">📍</span>
+                                    <input type="text" id="offer-location-text" class="form-control with-icon" placeholder="Example: Osh Bazaar, Bishkek">
+                                </div>
+                                <button type="button" class="btn btn-outline use-location-btn" onclick="useCurrentOfferLocation()">Use current location</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Capacity & price</h3>
+                        </div>
+                        <div class="create-grid two-up">
+                            <div class="form-group">
+                                <label id="create-price-label">Price (KGS)</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">💰</span>
+                                    <input type="number" id="offer-price" class="form-control with-icon" placeholder="200" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="create-spots-label">Spots Available</label>
+                                <div class="input-shell">
+                                    <span class="input-icon">👥</span>
+                                    <input type="number" id="offer-spots" class="form-control with-icon" placeholder="3" min="1">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Extras</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-included">What's included?</label>
+                            <textarea id="offer-included" class="form-control create-textarea" placeholder="Tea, ingredients, transport, materials..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-notes">Requirements / Notes</label>
+                            <textarea id="offer-notes" class="form-control create-textarea" placeholder="What guests should know before booking..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="offer-languages">Languages</label>
+                            <select id="offer-languages" class="form-control" multiple size="3">
+                                <option value="English">English</option>
+                                <option value="Russian">Russian</option>
+                                <option value="Kyrgyz">Kyrgyz</option>
+                            </select>
+                            <div class="field-hint">Select one or more languages you can host in.</div>
+                        </div>
+                    </section>
+
+                    <section class="create-section">
+                        <div class="create-section-header">
+                            <h3>Booking option</h3>
+                        </div>
+                        <label class="toggle-card">
+                            <div>
+                                <div class="toggle-card-title">Available now</div>
+                                <div class="toggle-card-copy">Let travelers book instantly from the feed.</div>
+                            </div>
+                            <span class="switch">
+                                <input type="checkbox" id="offer-live-toggle" checked>
+                                <span class="slider"></span>
+                            </span>
+                        </label>
+                    </section>
+                </div>
+
+                <div class="create-offer-footer">
+                    <div class="create-offer-footer-copy">
+                        <strong>Ready to publish?</strong>
+                        <span>Your cover photo and core details will appear in the explore feed.</span>
+                    </div>
+                    <button class="btn btn-primary create-submit-sticky" id="create-submit-btn" onclick="submitNewOffer()">Publish Offer</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Core State Framework (ICF Compliant) -->
     <script src="shared-state.js"></script>
+    <script src="language.js"></script>
     <script src="badges.js"></script>
     <script src="profile.js"></script>
     <script src="onboarding.js"></script>
