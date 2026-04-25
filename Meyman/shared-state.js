@@ -345,6 +345,9 @@ function validateAction(actionType, payload) {
     if (actionType === "BOOK_OFFER") {
         return payload && payload.offerId !== undefined;
     }
+    if (actionType === "CANCEL_BOOKING") {
+        return payload && payload.bookingId;
+    }
     if (actionType === "CREATE_REQUEST") {
         return payload && payload.description && payload.category;
     }
@@ -414,6 +417,9 @@ function addContext(actionType, normalizedPayload) {
     }
     if (actionType === "BOOK_OFFER") {
         context.bookingId = "booking_" + Date.now();
+    }
+    if (actionType === "CANCEL_BOOKING") {
+        context.bookingId = String(normalizedPayload.bookingId);
     }
     if (actionType === "CREATE_REQUEST") {
         context.requestId = "req_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
@@ -492,6 +498,17 @@ function processAction(actionType, currentState, context) {
             throw new Error("Offer not found or no spots available.");
         }
     }
+    else if (actionType === "CANCEL_BOOKING") {
+        var bookingFound = false;
+        for (var c = 0; c < newState.bookings.length; c++) {
+            if (newState.bookings[c].bookingId === context.bookingId) {
+                newState.bookings.splice(c, 1);
+                bookingFound = true;
+                break;
+            }
+        }
+        if (!bookingFound) throw new Error("Booking not found.");
+    }
     else if (actionType === "CREATE_REQUEST") {
         // Ensure requests array exists for old state versions
         if (!newState.requests) newState.requests = [];
@@ -537,6 +554,9 @@ function finalizeAction(actionType, processedState, context) {
         return { success: true, offerId: context.offerId };
     }
     if (actionType === "BOOK_OFFER") {
+        return { success: true, bookingId: context.bookingId };
+    }
+    if (actionType === "CANCEL_BOOKING") {
         return { success: true, bookingId: context.bookingId };
     }
     if (actionType === "CREATE_REQUEST") {

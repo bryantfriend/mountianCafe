@@ -13,15 +13,13 @@
         <header class="top-bar">
             <div class="header-row tourist-header-row">
                 <div class="logo-area tourist-brand">
-                    <img src="logo.png" alt="Meiman Logo" class="tourist-brand-logo">
                     <div class="tourist-brand-wordmark">MEIMAN</div>
                 </div>
                 <div class="tourist-header-actions">
                     <button class="guide-chip" id="guide-chip" onclick="openCulturalGuide()">Cultural Guide</button>
                     <a href="seller.html" id="host-mode-link" class="top-mini-link">Host Mode</a>
                     <button class="language-globe-btn" id="top-language-btn" onclick="openLanguageSelector(false)" aria-label="Change language" title="Change language">🌐</button>
-                    <div class="location-chip">📍 Bishkek</div>
-                    <div class="version-chip">v2.4</div>
+                    <div class="version-chip">v2.5</div>
                 </div>
             </div>
 
@@ -34,14 +32,6 @@
             <div class="search-bar tourist-search-bar">
                 <span>🔍</span>
                 <input type="text" id="search-input" placeholder="Search experiences, food, places...">
-            </div>
-
-            <div class="need-now-bar" id="need-now-tabs">
-                <button class="need-chip" data-need="Food">Hungry</button>
-                <button class="need-chip" data-need="Nomad">Nomad life</button>
-                <button class="need-chip" data-need="Culture">Craft</button>
-                <button class="need-chip" data-need="Shower">Shower</button>
-                <button class="need-chip" data-need="Laundry">Laundry</button>
             </div>
 
             <div class="categories-scroll" id="category-tabs">
@@ -69,7 +59,7 @@
 
             <!-- Floating Happening Now Cards -->
             <section class="happening-now">
-                <h3 class="section-title" id="happening-title">Happening Now 🔥</h3>
+                <h3 class="section-title" id="happening-title">Nearby on the map</h3>
                 <div class="horizontal-feed" id="happening-feed">
                     <!-- Offer Cards injected here by JS -->
                 </div>

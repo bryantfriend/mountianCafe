@@ -3,6 +3,7 @@
 function initCustomerApp() {
     window.currentCategoryFilter = "All";
     window.currentNeedFilter = "";
+    window.selectedMapOfferId = "";
     window.selectedPaymentMethod = "mbank";
     window.pendingPaymentOfferId = "";
     window.applyAppTranslations = function() {
@@ -14,7 +15,6 @@ function initCustomerApp() {
     applyCustomerTranslations();
     renderMapAndFeed();
     setupCategoryTabs();
-    setupNeedNowTabs();
     setupBottomSheetDrag();
     switchTab("explore");
 }
@@ -43,19 +43,14 @@ function applyCustomerTranslations() {
     var searchInput = document.getElementById("search-input");
     if (searchInput) searchInput.placeholder = t("search_placeholder");
 
-    var needChips = document.getElementsByClassName("need-chip");
-    for (var i = 0; i < needChips.length; i++) {
-        needChips[i].textContent = getNeedLabel(needChips[i].getAttribute("data-need"));
-    }
-
     var catPills = document.getElementsByClassName("cat-pill");
-    for (var j = 0; j < catPills.length; j++) {
-        catPills[j].textContent = getCategoryLabel(catPills[j].getAttribute("data-category"));
+    for (var i = 0; i < catPills.length; i++) {
+        catPills[i].textContent = getCategoryLabel(catPills[i].getAttribute("data-category"));
     }
 
     var ids = {
         "app-motto": "motto",
-        "happening-title": "happening_now",
+        "happening-title": "nearby_on_map",
         "discover-title": "discover",
         "request-modal-title": "request_experience",
         "request-modal-desc": "request_desc",
@@ -149,6 +144,15 @@ function getOfferBackground(offer, width) {
 function getAvailabilityText(offer) {
     if (offer.isLive) return t("available_now");
     return offer.startTime || offer.urgency || t("starting_soon");
+}
+
+function getVisibleSortedOffers(state) {
+    var sortedOffers = getSortedOffers((state && state.offers) || []);
+    var visible = [];
+    for (var i = 0; i < sortedOffers.length; i++) {
+        if (offerVisibleForFilters(sortedOffers[i])) visible.push(sortedOffers[i]);
+    }
+    return visible;
 }
 
 function renderTags(tags) {
@@ -285,7 +289,10 @@ function renderBookingCard(booking, offer) {
                     paymentLabel +
                     '<div class="tag-row">' + firstTag + '</div>' +
                 '</div>' +
-                '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">' + t("review") + '</button>' +
+                '<div class="booking-action-group">' +
+                    '<button class="btn btn-outline booking-review-btn" onclick="openReviewModal(\'' + offer.id + '\')">' + t("review") + '</button>' +
+                    '<button class="btn btn-outline booking-cancel-btn" onclick="cancelBooking(\'' + booking.bookingId + '\')">' + t("cancel_booking") + '</button>' +
+                '</div>' +
             '</div>' +
         '</article>';
 }
@@ -346,52 +353,82 @@ function renderMapAndFeed() {
     var currentState = loadState();
     var mapLayer = document.getElementById("interactive-map");
     var feedContainer = document.getElementById("happening-feed");
+    if (!mapLayer || !feedContainer) return;
 
     mapLayer.innerHTML = "";
     feedContainer.innerHTML = "";
 
-    if (currentState.offers.length === 0) {
-        feedContainer.innerHTML = '<div style="background:white; padding:1rem; border-radius:var(--radius-md); text-align:center; flex:1;">No experiences happening right now.</div>';
+    var visibleOffers = getVisibleSortedOffers(currentState);
+    if (visibleOffers.length === 0) {
+        feedContainer.innerHTML = '<div class="map-empty-state">' + t("no_experiences_now") + '</div>';
         return;
     }
 
-    var sortedOffers = getSortedOffers(currentState.offers);
+    var userDot = document.createElement("div");
+    userDot.className = "user-location-dot";
+    userDot.style.left = "50%";
+    userDot.style.top = "58%";
+    mapLayer.appendChild(userDot);
 
-    for (var i = 0; i < sortedOffers.length; i++) {
-        var offer = sortedOffers[i];
-        if (!offerVisibleForFilters(offer)) continue;
+    var selectedOfferId = window.selectedMapOfferId;
+    var hasSelected = false;
 
-        var availableSpots = getAvailableSpots(currentState, offer);
+    for (var i = 0; i < visibleOffers.length; i++) {
+        if (visibleOffers[i].id === selectedOfferId) {
+            hasSelected = true;
+            break;
+        }
+    }
 
-        // Create Map Pin
-        var pin = document.createElement("div");
-        pin.className = "map-pin";
-        // Convert pseudo-lat/lng offsets into literal percentages for CSS
+    if (!hasSelected) {
+        selectedOfferId = visibleOffers[0].id;
+        window.selectedMapOfferId = selectedOfferId;
+    }
+
+    for (var j = 0; j < visibleOffers.length; j++) {
+        var offer = visibleOffers[j];
+        var pin = document.createElement("button");
+        pin.type = "button";
+        pin.className = "map-pin" + (offer.id === selectedOfferId ? " active" : "");
         pin.style.left = offer.location.x + "%";
         pin.style.top = offer.location.y + "%";
-        
-        // Pass index to avoid closure loop issues without arrow funcs
         pin.setAttribute("data-offer-id", offer.id);
         pin.onclick = function() {
-            openOfferModalById(this.getAttribute("data-offer-id"));
+            selectMapOffer(this.getAttribute("data-offer-id"));
         };
         mapLayer.appendChild(pin);
-
-        // Create Horizontal Feed Card
-        var card = document.createElement("div");
-        card.className = "offer-card" + (offer.isLive ? " live-card" : "");
-
-        var spotsNotice = availableSpots > 0 ? availableSpots + " spots left" : "Fully Booked";
-        var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
-
-        card.innerHTML = renderExperienceCard(offer, { imageWidth: 500 }).replace(
-            '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>',
-            '<div class="spots-badge">' + spotsNotice + '</div><button class="btn btn-primary" ' + buttonDisabled + ' onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">Book Now</button>'
-        );
-        card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
-            
-        feedContainer.appendChild(card);
     }
+
+    renderMapSelectedOffer(feedContainer, currentState, findOfferInState(currentState, selectedOfferId));
+}
+
+function renderMapSelectedOffer(feedContainer, currentState, offer) {
+    if (!offer) {
+        feedContainer.innerHTML = '<div class="map-empty-state">' + t("tap_pin_hint") + '</div>';
+        return;
+    }
+
+    var availableSpots = getAvailableSpots(currentState, offer);
+    var spotsNotice = availableSpots > 0 ? t("spots_left", { count: availableSpots }) : t("fully_booked");
+    var buttonDisabled = availableSpots <= 0 ? "disabled" : "";
+    var bookButton = '<button class="btn btn-primary" onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">' + t("book_now") + '</button>';
+
+    var card = document.createElement("div");
+    card.className = "offer-card map-focus-card" + (offer.isLive ? " live-card" : "");
+    card.innerHTML = renderExperienceCard(offer, { imageWidth: 500 }).replace(
+        bookButton,
+        '<div class="spots-badge">' + spotsNotice + '</div><button class="btn btn-primary" ' + buttonDisabled + ' onclick="event.stopPropagation(); openPaymentModal(\'' + offer.id + '\')">' + t("book_now") + '</button>'
+    );
+    card.onclick = function() {
+        openOfferModalById(offer.id);
+    };
+
+    feedContainer.appendChild(card);
+}
+
+function selectMapOffer(offerId) {
+    window.selectedMapOfferId = offerId;
+    renderMapAndFeed();
 }
 
 function openOfferModal(index) {
@@ -418,11 +455,11 @@ function openOfferModal(index) {
         '<div style="background:var(--bg-main); padding:1.25rem; border-radius:var(--radius-md); margin-top:1rem; border:1px solid var(--border-color);">' +
             '<div style="font-size:1.75rem; font-weight:800; color:var(--primary);">' + offer.price + ' <span style="font-size:1rem; font-weight:600; color:var(--text-secondary);">KGS / person</span></div>' +
             '<div style="color:var(--text-primary); font-weight:600; margin-top:6px; display:flex; align-items:center; gap:6px;">' + 
-                (availableSpots > 0 ? "<span style='color:#34c759;'>●</span> Available NOW (" + availableSpots + " left)" : "<span style='color:var(--primary);'>●</span> Fully Booked") + 
+                (availableSpots > 0 ? "<span style='color:#34c759;'>●</span> " + t("available_now") + " (" + t("spots_left", { count: availableSpots }) + ")" : "<span style='color:var(--primary);'>●</span> " + t("fully_booked")) + 
             '</div>' +
         '</div>' +
         '<div style="display:flex; gap:1rem; margin-top:1.5rem;">' +
-            '<button class="btn btn-primary" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="openPaymentModal(\'' + offer.id + '\')">Book Now</button>' +
+            '<button class="btn btn-primary" ' + (availableSpots <= 0 ? "disabled" : "") + ' onclick="openPaymentModal(\'' + offer.id + '\')">' + t("book_now") + '</button>' +
         '</div>';
 
     document.getElementById("booking-modal").classList.remove("hidden");
@@ -599,6 +636,18 @@ function bookOffer(offerId, paymentMethodName) {
     }
 }
 
+function cancelBooking(bookingId) {
+    var result = executeAction("CANCEL_BOOKING", { bookingId: bookingId });
+    if (result.success) {
+        renderMapAndFeed();
+        renderExploreFeed();
+        openDummyFeature("Bookings");
+        alert(t("booking_cancelled"));
+    } else {
+        alert(t("cancel_failed", { error: result.error }));
+    }
+}
+
 function renderBookingSuccess(offer, paymentMethodName) {
     var title = offer ? offer.title : "your experience";
     var host = offer ? offer.hostName : "your host";
@@ -669,7 +718,7 @@ function setupCategoryTabs() {
             for (var j = 0; j < pills.length; j++) pills[j].classList.remove("active");
             this.classList.add("active");
             
-            window.currentCategoryFilter = this.innerText.trim();
+            window.currentCategoryFilter = this.getAttribute("data-category") || "All";
             window.currentNeedFilter = "";
             clearNeedNowActive();
             renderMapAndFeed();
@@ -715,7 +764,7 @@ function resetCategoryFilterToAll() {
     var pills = document.getElementsByClassName("cat-pill");
     for (var i = 0; i < pills.length; i++) {
         pills[i].classList.remove("active");
-        if (pills[i].innerText.trim() === "All") pills[i].classList.add("active");
+        if (pills[i].getAttribute("data-category") === "All") pills[i].classList.add("active");
     }
     window.currentCategoryFilter = "All";
 }
@@ -855,15 +904,14 @@ function openDummyFeature(featureName) {
     } else if (featureName === 'Profile') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem;">';
         htmlContent += '<div style="width:80px; height:80px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:2.5rem;">😎</div>';
-        htmlContent += '<div style="font-weight:700; font-size:1.2rem; color:var(--text-primary);">Hackathon Guest</div>';
-        htmlContent += '<div style="font-size:0.9rem; color:var(--text-secondary);">Joined April 2026</div>';
-        htmlContent += '<button class="btn btn-primary" style="margin-top:1rem;" onclick="openCulturalGuide()">Open Cultural Guide</button>';
+        htmlContent += '<div style="font-weight:700; font-size:1.2rem; color:var(--text-primary);">' + t("traveler_profile_name") + '</div>';
+        htmlContent += '<div style="font-size:0.9rem; color:var(--text-secondary);">' + t("joined_april_2026") + '</div>';
         htmlContent += '</div>';
         htmlContent += '<div data-profile-badges="tourist">' + renderBadgeGrid({ group: "tourist" }) + '</div>';
         htmlContent += '<div style="margin-top:2rem; display:flex; flex-direction:column; gap:0.5rem;">';
-        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Payment Methods <span style="float:right;">&rarr;</span></button>';
-        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">Language (EN) <span style="float:right;">&rarr;</span></button>';
-        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--primary);">Log Out <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);">' + t("payment_methods_arrow") + ' <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--text-primary);" onclick="openLanguageSelector(false)">' + t("language_setting", { code: getLanguageShortCode() }) + ' <span style="float:right;">&rarr;</span></button>';
+        htmlContent += '<button class="btn btn-outline" style="width:100%; text-align:left; padding:1rem; border-color:transparent; background:var(--bg-main); color:var(--primary);">' + t("log_out") + ' <span style="float:right;">&rarr;</span></button>';
         htmlContent += '</div>';
     }
 
