@@ -11,16 +11,17 @@
     <div class="container">
         <!-- Main Top Bar -->
         <header class="top-bar">
-            <div class="header-row">
-                <div class="logo-area">
-                    <img src="logo.png" alt="Meiman Logo" style="height:48px; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+            <div class="header-row tourist-header-row">
+                <div class="logo-area tourist-brand">
+                    <img src="logo.png" alt="Meiman Logo" class="tourist-brand-logo">
+                    <div class="tourist-brand-wordmark">MEIMAN</div>
                 </div>
-                <div style="display:flex; align-items:center; gap:8px;">
+                <div class="tourist-header-actions">
                     <button class="guide-chip" id="guide-chip" onclick="openCulturalGuide()">Cultural Guide</button>
-                    <a href="seller.html" id="host-mode-link" style="font-size:0.75rem; font-weight:800; color:var(--primary); text-decoration:none; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm); border:1px solid var(--primary);">Host Mode</a>
+                    <a href="seller.html" id="host-mode-link" class="top-mini-link">Host Mode</a>
                     <button class="language-globe-btn" id="top-language-btn" onclick="openLanguageSelector(false)" aria-label="Change language" title="Change language">🌐</button>
-                    <div style="font-size:0.85rem; font-weight:600; background:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">📍 Bishkek</div>
-                    <div style="font-size:0.85rem; font-weight:800; background:var(--primary); color:white; padding:4px 8px; border-radius:12px; box-shadow:var(--shadow-sm);">v2.3</div>
+                    <div class="location-chip">📍 Bishkek</div>
+                    <div class="version-chip">v2.4</div>
                 </div>
             </div>
 
@@ -30,7 +31,7 @@
                 <button class="toggle-btn active" id="btn-tab-explore" onclick="switchTab('explore')">Explore</button>
             </div>
 
-            <div class="search-bar" style="margin-top:0.75rem;">
+            <div class="search-bar tourist-search-bar">
                 <span>🔍</span>
                 <input type="text" id="search-input" placeholder="Search experiences, food, places...">
             </div>
@@ -78,16 +79,7 @@
         <!-- VIEW: EXPLORE -->
         <div id="view-explore" class="view-tab active">
             <div class="explore-content">
-                <div class="category-section">
-                    <h3 id="explore-food-title">🍽️ Eat Like a Local</h3>
-                    <div class="horizontal-feed" id="explore-cat-food"></div>
-                </div>
-                <div class="category-section">
-                    <h3 id="explore-outdoors-title">🏔️ Nomad Life & Craft</h3>
-                    <div class="horizontal-feed" id="explore-cat-outdoors"></div>
-                </div>
-                
-                <h3 class="feed-title" id="discover-title" style="padding:0 1.25rem 0.5rem; font-weight:800; font-size:1.4rem;">Discover</h3>
+                <h3 class="feed-title" id="discover-title">Popular experiences</h3>
                 <div id="explore-vertical-feed" class="vertical-feed">
                     <!-- Immersive vertical cards injected here -->
                 </div>

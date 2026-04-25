@@ -56,8 +56,6 @@ function applyCustomerTranslations() {
     var ids = {
         "app-motto": "motto",
         "happening-title": "happening_now",
-        "explore-food-title": "eat_like_local_short",
-        "explore-outdoors-title": "nomad_craft_short",
         "discover-title": "discover",
         "request-modal-title": "request_experience",
         "request-modal-desc": "request_desc",
@@ -295,27 +293,6 @@ function renderBookingCard(booking, offer) {
 function renderExploreFeed() {
     var currentState = loadState();
     var sortedOffers = getSortedOffers(currentState.offers);
-    
-    // Render Categories
-    var cats = ["food", "outdoors"];
-    var catsFilter = ["Eat Like a Local 🍽️", "Nomad Life 🏔️"];
-    for (var c=0; c<cats.length; c++) {
-        var container = document.getElementById("explore-cat-" + cats[c]);
-        if (!container) continue;
-        container.innerHTML = "";
-        for (var i=0; i<sortedOffers.length; i++) {
-            var offer = sortedOffers[i];
-            if (offer.category === catsFilter[c] || (c === 1 && offer.category === "Culture & Craft 🎨")) {
-                var card = document.createElement("div");
-                card.className = "offer-card" + (offer.isLive ? " live-card" : "");
-                card.style.minWidth = "220px";
-                card.style.width = "220px";
-                card.innerHTML = renderExperienceCard(offer, { compact: true, hideButton: true, imageWidth: 400 });
-                card.onclick = (function(id) { return function() { openOfferModalById(id); }; })(offer.id);
-                container.appendChild(card);
-            }
-        }
-    }
 
     // Render Vertical Feed
     var feedContainer = document.getElementById("explore-vertical-feed");
@@ -332,22 +309,31 @@ function renderExploreFeed() {
         var verticalTrustPills = renderBadgePills(offer.badges || getHostTrustBadges(offer.hostName));
         var liveHtml = offer.isLive ? '<div class="live-badge">LIVE NOW</div>' : "";
         card.innerHTML = 
-            '<div class="explore-card-img" style="background-image: ' + getOfferBackground(offer, 600) + ';">' + liveHtml + '</div>' +
-            '<div class="explore-card-overlay">' +
-                '<div class="explore-card-title">' + offer.title + '</div>' +
-                '<div class="availability-line overlay-availability ' + (offer.isLive ? "is-live" : "") + '">' + getAvailabilityText(offer) + '</div>' +
-                '<div class="host-row overlay-host">' +
+            '<div class="explore-card-media" style="background-image: ' + getOfferBackground(offer, 600) + ';">' +
+                liveHtml +
+                '<button class="card-favorite-btn" aria-hidden="true">♡</button>' +
+            '</div>' +
+            '<div class="explore-card-body-clean">' +
+                '<div class="explore-card-topline">' +
+                    '<div class="explore-card-title">' + offer.title + '</div>' +
+                    '<div class="explore-card-price-inline">' + offer.price + ' KGS</div>' +
+                '</div>' +
+                '<div class="explore-card-submeta">' +
+                    '<span>⏱️ ' + (offer.isLive ? getAvailabilityText(offer) : (offer.startTime || t("starting_soon"))) + '</span>' +
+                    '<span>📍 ' + offer.distance + '</span>' +
+                '</div>' +
+                '<div class="host-row">' +
                     '<img class="host-avatar" src="' + offer.hostImage + '" alt="' + offer.hostName + '">' +
                     '<div class="host-copy">' +
                         '<div class="host-name">' + offer.hostName + '</div>' +
-                        '<div class="host-meta">⭐ ' + offer.rating + ' • ' + offer.distance + '</div>' +
+                        '<div class="host-meta">⭐ ' + offer.rating + ' • ' + getAvailabilityText(offer) + '</div>' +
                     '</div>' +
                 '</div>' +
-                '<div class="badge-pill-row overlay-pills">' + verticalTrustPills + '</div>' +
-                '<div class="tag-row overlay-tags">' + renderTags(offer.tags) + '</div>' +
-                '<div class="explore-card-footer">' +
-                    '<div class="explore-card-price">' + offer.price + ' <span>KGS</span></div>' +
-                    '<button class="btn btn-primary" style="width:auto; padding:0.6rem 1.2rem; margin:0; border-radius:12px; box-shadow:0 4px 12px rgba(211,47,47,0.4);" onclick="event.stopPropagation(); openPaymentModal(\''+offer.id+'\')">Book Now</button>' +
+                '<div class="badge-pill-row">' + verticalTrustPills + '</div>' +
+                '<div class="tag-row">' + renderTags(offer.tags) + '</div>' +
+                '<div class="explore-card-footer-clean">' +
+                    '<div class="explore-card-rating">⭐ ' + offer.rating + '</div>' +
+                    '<button class="btn btn-primary explore-inline-book" onclick="event.stopPropagation(); openPaymentModal(\''+offer.id+'\')">' + t("book_now") + '</button>' +
                 '</div>' +
             '</div>';
         
