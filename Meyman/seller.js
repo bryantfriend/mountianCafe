@@ -955,6 +955,212 @@ function fulfillRequest(requestId) {
     }
 }
 
+var HOST_SETTINGS_KEY = "meimanHostSettings";
+var HOST_PAYOUTS_KEY = "meimanHostPayouts";
+var KYRGYZ_BANKS = [
+    "MBANK",
+    "Optima 24",
+    "BakAi",
+    "Kompanion",
+    "DemirBank",
+    "KICB",
+    "Eldik Bank"
+];
+
+function getHostSettings() {
+    var defaults = {
+        instantBookings: true,
+        bookingNotifications: true
+    };
+
+    try {
+        var raw = localStorage.getItem(HOST_SETTINGS_KEY);
+        if (!raw) return defaults;
+        var parsed = JSON.parse(raw);
+        return {
+            instantBookings: parsed.instantBookings !== false,
+            bookingNotifications: parsed.bookingNotifications !== false
+        };
+    } catch (error) {
+        return defaults;
+    }
+}
+
+function saveHostSettingsFromModal() {
+    var instantBookingsInput = document.getElementById("host-setting-instant-bookings");
+    var notificationsInput = document.getElementById("host-setting-booking-notifications");
+    var settings = {
+        instantBookings: instantBookingsInput ? instantBookingsInput.checked : true,
+        bookingNotifications: notificationsInput ? notificationsInput.checked : true
+    };
+
+    localStorage.setItem(HOST_SETTINGS_KEY, JSON.stringify(settings));
+    alert("Host settings saved.");
+    closeDummyFeature();
+}
+
+function getHostPayouts() {
+    try {
+        var raw = localStorage.getItem(HOST_PAYOUTS_KEY);
+        if (!raw) return [];
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveHostPayout(bankName) {
+    var bankSelect = document.getElementById("host-bank-select");
+    var accountInput = document.getElementById("host-bank-account");
+    var selectedBank = bankName || (bankSelect ? bankSelect.value : "");
+    var accountNumber = accountInput ? accountInput.value.trim() : "";
+
+    if (!selectedBank || !accountNumber) {
+        alert("Please select a bank and enter an account number.");
+        return;
+    }
+
+    var payouts = getHostPayouts();
+    var nextPayouts = [];
+    var replaced = false;
+
+    for (var i = 0; i < payouts.length; i++) {
+        if (payouts[i].bank === selectedBank) {
+            nextPayouts.push({ bank: selectedBank, accountNumber: accountNumber });
+            replaced = true;
+        } else {
+            nextPayouts.push(payouts[i]);
+        }
+    }
+
+    if (!replaced) {
+        nextPayouts.push({ bank: selectedBank, accountNumber: accountNumber });
+    }
+
+    localStorage.setItem(HOST_PAYOUTS_KEY, JSON.stringify(nextPayouts));
+    renderManagePaymentsModal();
+}
+
+function toggleAddBankForm() {
+    var form = document.getElementById("add-bank-form");
+    if (!form) return;
+    form.classList.toggle("hidden");
+}
+
+function maskAccountNumber(accountNumber) {
+    var value = String(accountNumber || "");
+    if (value.length <= 4) return value;
+    return "•••• " + value.slice(-4);
+}
+
+function renderHostSettingsModal() {
+    var modal = document.getElementById("dummy-feature-modal");
+    var sheet = document.getElementById("dummy-feature-sheet");
+    var settings = getHostSettings();
+    var htmlContent = "";
+
+    modal.classList.remove("service-detail-modal");
+
+    htmlContent += '<div class="sheet-handle"></div>';
+    htmlContent += '<div class="host-modal-header">';
+    htmlContent += '<div><h2>Host Settings</h2><p>Choose how you want Meiman to support your bookings.</p></div>';
+    htmlContent += '<button class="btn-icon host-modal-close" onclick="closeDummyFeature()">✕</button>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="host-settings-list">';
+    htmlContent += '<label class="host-setting-row">';
+    htmlContent += '<div><div class="host-setting-title">Allow instant bookings</div><div class="host-setting-copy">Let travelers confirm immediately when your service is live.</div></div>';
+    htmlContent += '<input id="host-setting-instant-bookings" type="checkbox" ' + (settings.instantBookings ? 'checked' : '') + '>';
+    htmlContent += '</label>';
+    htmlContent += '<label class="host-setting-row">';
+    htmlContent += '<div><div class="host-setting-title">Booking notifications</div><div class="host-setting-copy">Get alerts when a guest books or changes a reservation.</div></div>';
+    htmlContent += '<input id="host-setting-booking-notifications" type="checkbox" ' + (settings.bookingNotifications ? 'checked' : '') + '>';
+    htmlContent += '</label>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="host-modal-actions">';
+    htmlContent += '<button class="btn btn-outline" onclick="closeDummyFeature()">Cancel</button>';
+    htmlContent += '<button class="btn btn-primary" onclick="saveHostSettingsFromModal()">Save Settings</button>';
+    htmlContent += '</div>';
+
+    sheet.innerHTML = htmlContent;
+    modal.classList.remove("hidden");
+}
+
+function renderManagePaymentsModal() {
+    var modal = document.getElementById("dummy-feature-modal");
+    var sheet = document.getElementById("dummy-feature-sheet");
+    var payouts = getHostPayouts();
+    var htmlContent = "";
+
+    modal.classList.remove("service-detail-modal");
+
+    htmlContent += '<div class="sheet-handle"></div>';
+    htmlContent += '<div class="host-modal-header">';
+    htmlContent += '<div><h2>Manage Payments</h2><p>Add the bank account where you want host payouts to land.</p></div>';
+    htmlContent += '<button class="btn-icon host-modal-close" onclick="closeDummyFeature()">✕</button>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="host-payout-summary">';
+    htmlContent += '<div class="host-payout-summary-icon">💳</div>';
+    htmlContent += '<div><strong>Connected payout methods</strong><span>Keep one or more local banks ready for withdrawals.</span></div>';
+    htmlContent += '</div>';
+
+    if (payouts.length) {
+        htmlContent += '<div class="host-payout-list">';
+        for (var i = 0; i < payouts.length; i++) {
+            htmlContent += '<div class="host-payout-item">';
+            htmlContent += '<div><div class="host-payout-bank">' + payouts[i].bank + '</div><div class="host-payout-account">' + maskAccountNumber(payouts[i].accountNumber) + '</div></div>';
+            htmlContent += '<span class="host-payout-status">Saved</span>';
+            htmlContent += '</div>';
+        }
+        htmlContent += '</div>';
+    } else {
+        htmlContent += '<div class="provider-empty-note">No bank info saved yet. Add one below for faster payouts.</div>';
+    }
+
+    htmlContent += '<button class="host-add-bank-btn" onclick="toggleAddBankForm()"><span>＋</span> Add bank info</button>';
+    htmlContent += '<div id="add-bank-form" class="host-bank-form hidden">';
+    htmlContent += '<label class="form-group"><span>Bank</span><select id="host-bank-select" class="form-control">';
+    for (var b = 0; b < KYRGYZ_BANKS.length; b++) {
+        htmlContent += '<option value="' + KYRGYZ_BANKS[b] + '">' + KYRGYZ_BANKS[b] + '</option>';
+    }
+    htmlContent += '</select></label>';
+    htmlContent += '<label class="form-group"><span>Account number</span><input id="host-bank-account" class="form-control" type="text" placeholder="Enter account number"></label>';
+    htmlContent += '<button class="btn btn-primary" onclick="saveHostPayout()">Save Bank Info</button>';
+    htmlContent += '</div>';
+
+    sheet.innerHTML = htmlContent;
+    modal.classList.remove("hidden");
+}
+
+function renderHelpSupportModal() {
+    var modal = document.getElementById("dummy-feature-modal");
+    var sheet = document.getElementById("dummy-feature-sheet");
+    var whatsappHref = "https://wa.me/996550346970";
+    var htmlContent = "";
+
+    modal.classList.remove("service-detail-modal");
+
+    htmlContent += '<div class="sheet-handle"></div>';
+    htmlContent += '<div class="host-modal-header">';
+    htmlContent += '<div><h2>Help & Support</h2><p>Quick answers for hosts, plus direct WhatsApp support.</p></div>';
+    htmlContent += '<button class="btn-icon host-modal-close" onclick="closeDummyFeature()">✕</button>';
+    htmlContent += '</div>';
+
+    htmlContent += '<div class="host-faq-list">';
+    htmlContent += '<div class="host-faq-card"><strong>How do I get paid?</strong><span>Add your bank info in Manage Payments and payouts can be sent there after bookings are completed.</span></div>';
+    htmlContent += '<div class="host-faq-card"><strong>How do I improve bookings?</strong><span>Add clear photos, keep availability current, and respond quickly when a guest books.</span></div>';
+    htmlContent += '<div class="host-faq-card"><strong>What if a guest needs help?</strong><span>Use the booking details screen to review the service and prepare clear arrival instructions.</span></div>';
+    htmlContent += '</div>';
+
+    htmlContent += '<a class="btn btn-primary host-whatsapp-btn" href="' + whatsappHref + '" target="_blank" rel="noopener noreferrer">WhatsApp Support</a>';
+
+    sheet.innerHTML = htmlContent;
+    modal.classList.remove("hidden");
+}
+
 // Dummy Feature Handlers for Host App Hackathon MVP
 function openDummyFeature(featureName) {
     var modal = document.getElementById("dummy-feature-modal");
@@ -986,11 +1192,11 @@ function openDummyFeature(featureName) {
     htmlContent += '</div>';
     
     if (featureName === 'Menu') {
-        htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
-        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Host Settings</button>';
-        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Manage Payments</button>';
-        htmlContent += '<button class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem;">Help & Support</button>';
-        htmlContent += '<a href="index.html" class="btn btn-outline" style="justify-content:flex-start; font-weight:600; font-size:1.1rem; border:none; padding:1rem; color:var(--primary); text-decoration:none;">Switch to Tourist Mode</a>';
+        htmlContent += '<div class="host-menu-list">';
+        htmlContent += '<button class="host-menu-item" onclick="renderHostSettingsModal()"><span>Host Settings</span><span>→</span></button>';
+        htmlContent += '<button class="host-menu-item" onclick="renderManagePaymentsModal()"><span>Manage Payments</span><span>→</span></button>';
+        htmlContent += '<button class="host-menu-item" onclick="renderHelpSupportModal()"><span>Help & Support</span><span>→</span></button>';
+        htmlContent += '<a href="index.html" class="host-menu-item host-menu-link"><span>Switch to Tourist Mode</span><span>→</span></a>';
         htmlContent += '</div>';
     } else if (featureName === 'Notifications') {
         htmlContent += '<div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">';
