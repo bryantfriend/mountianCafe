@@ -719,6 +719,7 @@ function closeBadgesModal() {
 function openProviderServiceManager(serviceId, mode) {
     var state = loadState();
     var offer = serviceId ? findOfferById(state.offers || [], serviceId) : null;
+    var modal = document.getElementById("dummy-feature-modal");
 
     if (mode === "public") {
         alert("Public provider profile preview opened for demo.");
@@ -734,6 +735,7 @@ function openProviderServiceManager(serviceId, mode) {
     }
 
     var sheet = document.getElementById("dummy-feature-sheet");
+    modal.classList.add("service-detail-modal");
     sheet.innerHTML =
         '<div class="sheet-handle"></div>' +
         '<div style="display:flex; justify-content:space-between; align-items:center;">' +
@@ -747,6 +749,8 @@ function openProviderServiceManager(serviceId, mode) {
             '<div class="tag-row">' + (offer.tags ? '<span class="tag">' + offer.tags.join('</span><span class="tag">') + '</span>' : '') + '</div>' +
             '<button class="btn btn-primary" style="margin-top:1rem;" onclick="alert(\'Quick edit tools coming next.\')">' + (mode === "edit" ? "Fix This Service" : "Edit Service") + '</button>' +
         '</div>';
+    sheet.scrollTop = 0;
+    modal.classList.remove("hidden");
 }
 
 function replyToReview(reviewId) {
@@ -830,6 +834,11 @@ function refreshDashboard() {
                 '</div>';
             
             el.innerHTML = htmlString;
+            el.onclick = (function(id) {
+                return function() {
+                    openProviderServiceManager(id, "view");
+                };
+            })(offer.id);
             listContainer.appendChild(el);
         }
     }
@@ -950,6 +959,7 @@ function fulfillRequest(requestId) {
 function openDummyFeature(featureName) {
     var modal = document.getElementById("dummy-feature-modal");
     var sheet = document.getElementById("dummy-feature-sheet");
+    modal.classList.remove("service-detail-modal");
     
     // Update active state in bottom nav if applicable
     var navItems = document.querySelectorAll(".nav-item");
@@ -1019,7 +1029,9 @@ function openDummyFeature(featureName) {
 }
 
 function closeDummyFeature() {
-    document.getElementById("dummy-feature-modal").classList.add("hidden");
+    var modal = document.getElementById("dummy-feature-modal");
+    modal.classList.add("hidden");
+    modal.classList.remove("service-detail-modal");
 }
 
 // Boot application

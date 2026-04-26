@@ -2299,6 +2299,7 @@ h3 { font-size: 1.1rem; font-weight: 600; }
     box-shadow: var(--shadow-sm);
     overflow: hidden;
     border: 1px solid rgba(0,0,0,0.03);
+    cursor: pointer;
 }
 
 .provider-service-thumb {
@@ -3059,6 +3060,10 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 }
 
 @media (min-width: 900px) {
+    .modal-overlay {
+        justify-content: center;
+    }
+
     body.customer-app,
     body.seller-app {
         min-height: 100vh;
@@ -3151,12 +3156,22 @@ h3 { font-size: 1.1rem; font-weight: 600; }
         width: min(720px, calc(100vw - 64px));
         max-height: min(88vh, 840px);
         border-radius: 28px 28px 0 0;
-        left: 50%;
-        transform: translateX(-50%);
+        transform: translateY(0);
     }
 
     .modal-overlay.hidden .bottom-sheet {
-        transform: translateX(-50%) translateY(100%);
+        transform: translateY(100%);
+    }
+
+    .modal-overlay.service-detail-modal {
+        align-items: center;
+        padding: 24px;
+    }
+
+    .modal-overlay.service-detail-modal .bottom-sheet {
+        width: min(560px, calc(100vw - 96px));
+        max-height: min(82vh, 760px);
+        border-radius: 28px;
     }
 
     .create-offer-sheet {
